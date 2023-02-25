@@ -197,7 +197,7 @@ class DoubleEncoder(nn.Module):
         bert_sequence = bert_sequence[:, 0:bert_segments_ids.size(1)]
         # input()
         bert_out, bert_pool_output, bert_all_out = self.Sent_encoder(
-            bert_sequence, token_type_ids=bert_segments_ids
+            bert_sequence, token_type_ids=bert_segments_ids, return_dict=False
         )
         bert_out = self.in_drop(bert_out)
         bert_out = bert_out[:, 0:max(l), :]
