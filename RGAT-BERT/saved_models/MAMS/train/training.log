@@ -1,0 +1,855 @@
+-----------  Configuration Arguments -----------
+att_dropout: 0.0
+batch_size: 16
+bert_lr: 2e-05
+bert_out_dim: 100
+data_dir: ../dataset/Biaffine/glove/MAMS
+dep_dim: 80
+direct: False
+hidden_dim: 768
+input_dropout: 0.1
+l2: 1e-05
+layer_dropout: 0
+log_step: 16
+loop: True
+lower: True
+lr: 1e-05
+max_len: 90
+model: RGAT
+num_class: 3
+num_epoch: 10
+num_layer: 2
+optim: adam
+output_merge: gate
+pos_dim: 0
+post_dim: 0
+reset_pooling: True
+save_dir: saved_models/MAMS/train
+seed: 38
+vocab_dir: ../dataset/Biaffine/glove/MAMS
+------------------------------------------------
+Loading vocab...
+Loading vocab from: ../dataset/Biaffine/glove/MAMS/vocab_tok.vocab
+Loading vocab from: ../dataset/Biaffine/glove/MAMS/vocab_post.vocab
+Loading vocab from: ../dataset/Biaffine/glove/MAMS/vocab_pos.vocab
+Loading vocab from: ../dataset/Biaffine/glove/MAMS/vocab_dep.vocab
+Loading vocab from: ../dataset/Biaffine/glove/MAMS/vocab_pol.vocab
+token_vocab: 8403, post_vocab: 142, pos_vocab: 19, dep_vocab: 46, pol_vocab: 3
+Loading data from ../dataset/Biaffine/glove/MAMS with batch size 16...
+700 batches created for ../dataset/Biaffine/glove/MAMS/train.json
+84 batches created for ../dataset/Biaffine/glove/MAMS/valid.json
+84 batches created for ../dataset/Biaffine/glove/MAMS/test.json
+RGATABSA(
+  (enc): ABSAEncoder(
+    (dep_emb): Embedding(46, 80, padding_idx=0)
+    (encoder): DoubleEncoder(
+      (Sent_encoder): BertModel(
+        (embeddings): BertEmbeddings(
+          (word_embeddings): Embedding(30522, 768, padding_idx=0)
+          (position_embeddings): Embedding(512, 768)
+          (token_type_embeddings): Embedding(2, 768)
+          (LayerNorm): LayerNorm((768,), eps=1e-12, elementwise_affine=True)
+          (dropout): Dropout(p=0.1, inplace=False)
+        )
+        (encoder): BertEncoder(
+          (layer): ModuleList(
+            (0): BertLayer(
+              (attention): BertAttention(
+                (self): BertSelfAttention(
+                  (query): Linear(in_features=768, out_features=768, bias=True)
+                  (key): Linear(in_features=768, out_features=768, bias=True)
+                  (value): Linear(in_features=768, out_features=768, bias=True)
+                  (dropout): Dropout(p=0.1, inplace=False)
+                )
+                (output): BertSelfOutput(
+                  (dense): Linear(in_features=768, out_features=768, bias=True)
+                  (LayerNorm): LayerNorm((768,), eps=1e-12, elementwise_affine=True)
+                  (dropout): Dropout(p=0.1, inplace=False)
+                )
+              )
+              (intermediate): BertIntermediate(
+                (dense): Linear(in_features=768, out_features=3072, bias=True)
+              )
+              (output): BertOutput(
+                (dense): Linear(in_features=3072, out_features=768, bias=True)
+                (LayerNorm): LayerNorm((768,), eps=1e-12, elementwise_affine=True)
+                (dropout): Dropout(p=0.1, inplace=False)
+              )
+            )
+            (1): BertLayer(
+              (attention): BertAttention(
+                (self): BertSelfAttention(
+                  (query): Linear(in_features=768, out_features=768, bias=True)
+                  (key): Linear(in_features=768, out_features=768, bias=True)
+                  (value): Linear(in_features=768, out_features=768, bias=True)
+                  (dropout): Dropout(p=0.1, inplace=False)
+                )
+                (output): BertSelfOutput(
+                  (dense): Linear(in_features=768, out_features=768, bias=True)
+                  (LayerNorm): LayerNorm((768,), eps=1e-12, elementwise_affine=True)
+                  (dropout): Dropout(p=0.1, inplace=False)
+                )
+              )
+              (intermediate): BertIntermediate(
+                (dense): Linear(in_features=768, out_features=3072, bias=True)
+              )
+              (output): BertOutput(
+                (dense): Linear(in_features=3072, out_features=768, bias=True)
+                (LayerNorm): LayerNorm((768,), eps=1e-12, elementwise_affine=True)
+                (dropout): Dropout(p=0.1, inplace=False)
+              )
+            )
+            (2): BertLayer(
+              (attention): BertAttention(
+                (self): BertSelfAttention(
+                  (query): Linear(in_features=768, out_features=768, bias=True)
+                  (key): Linear(in_features=768, out_features=768, bias=True)
+                  (value): Linear(in_features=768, out_features=768, bias=True)
+                  (dropout): Dropout(p=0.1, inplace=False)
+                )
+                (output): BertSelfOutput(
+                  (dense): Linear(in_features=768, out_features=768, bias=True)
+                  (LayerNorm): LayerNorm((768,), eps=1e-12, elementwise_affine=True)
+                  (dropout): Dropout(p=0.1, inplace=False)
+                )
+              )
+              (intermediate): BertIntermediate(
+                (dense): Linear(in_features=768, out_features=3072, bias=True)
+              )
+              (output): BertOutput(
+                (dense): Linear(in_features=3072, out_features=768, bias=True)
+                (LayerNorm): LayerNorm((768,), eps=1e-12, elementwise_affine=True)
+                (dropout): Dropout(p=0.1, inplace=False)
+              )
+            )
+            (3): BertLayer(
+              (attention): BertAttention(
+                (self): BertSelfAttention(
+                  (query): Linear(in_features=768, out_features=768, bias=True)
+                  (key): Linear(in_features=768, out_features=768, bias=True)
+                  (value): Linear(in_features=768, out_features=768, bias=True)
+                  (dropout): Dropout(p=0.1, inplace=False)
+                )
+                (output): BertSelfOutput(
+                  (dense): Linear(in_features=768, out_features=768, bias=True)
+                  (LayerNorm): LayerNorm((768,), eps=1e-12, elementwise_affine=True)
+                  (dropout): Dropout(p=0.1, inplace=False)
+                )
+              )
+              (intermediate): BertIntermediate(
+                (dense): Linear(in_features=768, out_features=3072, bias=True)
+              )
+              (output): BertOutput(
+                (dense): Linear(in_features=3072, out_features=768, bias=True)
+                (LayerNorm): LayerNorm((768,), eps=1e-12, elementwise_affine=True)
+                (dropout): Dropout(p=0.1, inplace=False)
+              )
+            )
+            (4): BertLayer(
+              (attention): BertAttention(
+                (self): BertSelfAttention(
+                  (query): Linear(in_features=768, out_features=768, bias=True)
+                  (key): Linear(in_features=768, out_features=768, bias=True)
+                  (value): Linear(in_features=768, out_features=768, bias=True)
+                  (dropout): Dropout(p=0.1, inplace=False)
+                )
+                (output): BertSelfOutput(
+                  (dense): Linear(in_features=768, out_features=768, bias=True)
+                  (LayerNorm): LayerNorm((768,), eps=1e-12, elementwise_affine=True)
+                  (dropout): Dropout(p=0.1, inplace=False)
+                )
+              )
+              (intermediate): BertIntermediate(
+                (dense): Linear(in_features=768, out_features=3072, bias=True)
+              )
+              (output): BertOutput(
+                (dense): Linear(in_features=3072, out_features=768, bias=True)
+                (LayerNorm): LayerNorm((768,), eps=1e-12, elementwise_affine=True)
+                (dropout): Dropout(p=0.1, inplace=False)
+              )
+            )
+            (5): BertLayer(
+              (attention): BertAttention(
+                (self): BertSelfAttention(
+                  (query): Linear(in_features=768, out_features=768, bias=True)
+                  (key): Linear(in_features=768, out_features=768, bias=True)
+                  (value): Linear(in_features=768, out_features=768, bias=True)
+                  (dropout): Dropout(p=0.1, inplace=False)
+                )
+                (output): BertSelfOutput(
+                  (dense): Linear(in_features=768, out_features=768, bias=True)
+                  (LayerNorm): LayerNorm((768,), eps=1e-12, elementwise_affine=True)
+                  (dropout): Dropout(p=0.1, inplace=False)
+                )
+              )
+              (intermediate): BertIntermediate(
+                (dense): Linear(in_features=768, out_features=3072, bias=True)
+              )
+              (output): BertOutput(
+                (dense): Linear(in_features=3072, out_features=768, bias=True)
+                (LayerNorm): LayerNorm((768,), eps=1e-12, elementwise_affine=True)
+                (dropout): Dropout(p=0.1, inplace=False)
+              )
+            )
+            (6): BertLayer(
+              (attention): BertAttention(
+                (self): BertSelfAttention(
+                  (query): Linear(in_features=768, out_features=768, bias=True)
+                  (key): Linear(in_features=768, out_features=768, bias=True)
+                  (value): Linear(in_features=768, out_features=768, bias=True)
+                  (dropout): Dropout(p=0.1, inplace=False)
+                )
+                (output): BertSelfOutput(
+                  (dense): Linear(in_features=768, out_features=768, bias=True)
+                  (LayerNorm): LayerNorm((768,), eps=1e-12, elementwise_affine=True)
+                  (dropout): Dropout(p=0.1, inplace=False)
+                )
+              )
+              (intermediate): BertIntermediate(
+                (dense): Linear(in_features=768, out_features=3072, bias=True)
+              )
+              (output): BertOutput(
+                (dense): Linear(in_features=3072, out_features=768, bias=True)
+                (LayerNorm): LayerNorm((768,), eps=1e-12, elementwise_affine=True)
+                (dropout): Dropout(p=0.1, inplace=False)
+              )
+            )
+            (7): BertLayer(
+              (attention): BertAttention(
+                (self): BertSelfAttention(
+                  (query): Linear(in_features=768, out_features=768, bias=True)
+                  (key): Linear(in_features=768, out_features=768, bias=True)
+                  (value): Linear(in_features=768, out_features=768, bias=True)
+                  (dropout): Dropout(p=0.1, inplace=False)
+                )
+                (output): BertSelfOutput(
+                  (dense): Linear(in_features=768, out_features=768, bias=True)
+                  (LayerNorm): LayerNorm((768,), eps=1e-12, elementwise_affine=True)
+                  (dropout): Dropout(p=0.1, inplace=False)
+                )
+              )
+              (intermediate): BertIntermediate(
+                (dense): Linear(in_features=768, out_features=3072, bias=True)
+              )
+              (output): BertOutput(
+                (dense): Linear(in_features=3072, out_features=768, bias=True)
+                (LayerNorm): LayerNorm((768,), eps=1e-12, elementwise_affine=True)
+                (dropout): Dropout(p=0.1, inplace=False)
+              )
+            )
+            (8): BertLayer(
+              (attention): BertAttention(
+                (self): BertSelfAttention(
+                  (query): Linear(in_features=768, out_features=768, bias=True)
+                  (key): Linear(in_features=768, out_features=768, bias=True)
+                  (value): Linear(in_features=768, out_features=768, bias=True)
+                  (dropout): Dropout(p=0.1, inplace=False)
+                )
+                (output): BertSelfOutput(
+                  (dense): Linear(in_features=768, out_features=768, bias=True)
+                  (LayerNorm): LayerNorm((768,), eps=1e-12, elementwise_affine=True)
+                  (dropout): Dropout(p=0.1, inplace=False)
+                )
+              )
+              (intermediate): BertIntermediate(
+                (dense): Linear(in_features=768, out_features=3072, bias=True)
+              )
+              (output): BertOutput(
+                (dense): Linear(in_features=3072, out_features=768, bias=True)
+                (LayerNorm): LayerNorm((768,), eps=1e-12, elementwise_affine=True)
+                (dropout): Dropout(p=0.1, inplace=False)
+              )
+            )
+            (9): BertLayer(
+              (attention): BertAttention(
+                (self): BertSelfAttention(
+                  (query): Linear(in_features=768, out_features=768, bias=True)
+                  (key): Linear(in_features=768, out_features=768, bias=True)
+                  (value): Linear(in_features=768, out_features=768, bias=True)
+                  (dropout): Dropout(p=0.1, inplace=False)
+                )
+                (output): BertSelfOutput(
+                  (dense): Linear(in_features=768, out_features=768, bias=True)
+                  (LayerNorm): LayerNorm((768,), eps=1e-12, elementwise_affine=True)
+                  (dropout): Dropout(p=0.1, inplace=False)
+                )
+              )
+              (intermediate): BertIntermediate(
+                (dense): Linear(in_features=768, out_features=3072, bias=True)
+              )
+              (output): BertOutput(
+                (dense): Linear(in_features=3072, out_features=768, bias=True)
+                (LayerNorm): LayerNorm((768,), eps=1e-12, elementwise_affine=True)
+                (dropout): Dropout(p=0.1, inplace=False)
+              )
+            )
+            (10): BertLayer(
+              (attention): BertAttention(
+                (self): BertSelfAttention(
+                  (query): Linear(in_features=768, out_features=768, bias=True)
+                  (key): Linear(in_features=768, out_features=768, bias=True)
+                  (value): Linear(in_features=768, out_features=768, bias=True)
+                  (dropout): Dropout(p=0.1, inplace=False)
+                )
+                (output): BertSelfOutput(
+                  (dense): Linear(in_features=768, out_features=768, bias=True)
+                  (LayerNorm): LayerNorm((768,), eps=1e-12, elementwise_affine=True)
+                  (dropout): Dropout(p=0.1, inplace=False)
+                )
+              )
+              (intermediate): BertIntermediate(
+                (dense): Linear(in_features=768, out_features=3072, bias=True)
+              )
+              (output): BertOutput(
+                (dense): Linear(in_features=3072, out_features=768, bias=True)
+                (LayerNorm): LayerNorm((768,), eps=1e-12, elementwise_affine=True)
+                (dropout): Dropout(p=0.1, inplace=False)
+              )
+            )
+            (11): BertLayer(
+              (attention): BertAttention(
+                (self): BertSelfAttention(
+                  (query): Linear(in_features=768, out_features=768, bias=True)
+                  (key): Linear(in_features=768, out_features=768, bias=True)
+                  (value): Linear(in_features=768, out_features=768, bias=True)
+                  (dropout): Dropout(p=0.1, inplace=False)
+                )
+                (output): BertSelfOutput(
+                  (dense): Linear(in_features=768, out_features=768, bias=True)
+                  (LayerNorm): LayerNorm((768,), eps=1e-12, elementwise_affine=True)
+                  (dropout): Dropout(p=0.1, inplace=False)
+                )
+              )
+              (intermediate): BertIntermediate(
+                (dense): Linear(in_features=768, out_features=3072, bias=True)
+              )
+              (output): BertOutput(
+                (dense): Linear(in_features=3072, out_features=768, bias=True)
+                (LayerNorm): LayerNorm((768,), eps=1e-12, elementwise_affine=True)
+                (dropout): Dropout(p=0.1, inplace=False)
+              )
+            )
+          )
+        )
+        (pooler): BertPooler(
+          (dense): Linear(in_features=768, out_features=768, bias=True)
+          (activation): Tanh()
+        )
+      )
+      (in_drop): Dropout(p=0.1, inplace=False)
+      (dense): Linear(in_features=768, out_features=100, bias=True)
+      (dep_emb): Embedding(46, 80, padding_idx=0)
+      (Graph_encoder): RGATEncoder(
+        (transformer): ModuleList(
+          (0): RGATLayer(
+            (self_attn): MultiHeadedAttention(
+              (linear_keys): Linear(in_features=100, out_features=100, bias=True)
+              (linear_values): Linear(in_features=100, out_features=100, bias=True)
+              (linear_query): Linear(in_features=100, out_features=100, bias=True)
+              (linear_structure_k): Linear(in_features=80, out_features=25, bias=True)
+              (linear_structure_v): Linear(in_features=80, out_features=25, bias=True)
+              (softmax): Softmax(dim=-1)
+              (dropout): Dropout(p=0.0, inplace=False)
+              (final_linear): Linear(in_features=100, out_features=100, bias=True)
+            )
+            (feed_forward): PositionwiseFeedForward(
+              (w_1): Linear(in_features=100, out_features=768, bias=True)
+              (w_2): Linear(in_features=768, out_features=100, bias=True)
+              (layer_norm): LayerNorm((100,), eps=1e-06, elementwise_affine=True)
+              (dropout_1): Dropout(p=0.0, inplace=False)
+              (relu): ReLU()
+              (dropout_2): Dropout(p=0.0, inplace=False)
+            )
+            (layer_norm): LayerNorm((100,), eps=1e-06, elementwise_affine=True)
+            (dropout): Dropout(p=0.0, inplace=False)
+          )
+          (1): RGATLayer(
+            (self_attn): MultiHeadedAttention(
+              (linear_keys): Linear(in_features=100, out_features=100, bias=True)
+              (linear_values): Linear(in_features=100, out_features=100, bias=True)
+              (linear_query): Linear(in_features=100, out_features=100, bias=True)
+              (linear_structure_k): Linear(in_features=80, out_features=25, bias=True)
+              (linear_structure_v): Linear(in_features=80, out_features=25, bias=True)
+              (softmax): Softmax(dim=-1)
+              (dropout): Dropout(p=0.0, inplace=False)
+              (final_linear): Linear(in_features=100, out_features=100, bias=True)
+            )
+            (feed_forward): PositionwiseFeedForward(
+              (w_1): Linear(in_features=100, out_features=768, bias=True)
+              (w_2): Linear(in_features=768, out_features=100, bias=True)
+              (layer_norm): LayerNorm((100,), eps=1e-06, elementwise_affine=True)
+              (dropout_1): Dropout(p=0.0, inplace=False)
+              (relu): ReLU()
+              (dropout_2): Dropout(p=0.0, inplace=False)
+            )
+            (layer_norm): LayerNorm((100,), eps=1e-06, elementwise_affine=True)
+            (dropout): Dropout(p=0.0, inplace=False)
+          )
+        )
+        (layer_norm): LayerNorm((100,), eps=1e-06, elementwise_affine=True)
+      )
+    )
+    (gate_map): Linear(in_features=200, out_features=100, bias=True)
+  )
+  (classifier): Linear(in_features=868, out_features=3, bias=True)
+  (dropout): Dropout(p=0.1, inplace=False)
+)
+# parameters: 109984363
+Training Set: 700
+Valid/Test Set: 84
+Epoch 1------------------------------------------------------------
+15/700 train_loss: 1.043947, train_acc: 47.656250
+31/700 train_loss: 1.014236, train_acc: 49.804688
+47/700 train_loss: 1.004535, train_acc: 50.390625
+63/700 train_loss: 0.997423, train_acc: 50.488281
+79/700 train_loss: 0.970609, train_acc: 52.656250
+95/700 train_loss: 0.955475, train_acc: 53.776042
+111/700 train_loss: 0.940341, train_acc: 55.022321
+127/700 train_loss: 0.924733, train_acc: 55.761719
+143/700 train_loss: 0.918157, train_acc: 56.076389
+159/700 train_loss: 0.909821, train_acc: 56.718750
+175/700 train_loss: 0.892006, train_acc: 57.670455
+191/700 train_loss: 0.878539, train_acc: 58.626302
+207/700 train_loss: 0.863397, train_acc: 59.615385
+223/700 train_loss: 0.854183, train_acc: 59.988839
+239/700 train_loss: 0.843529, train_acc: 60.677083
+255/700 train_loss: 0.834353, train_acc: 61.254883
+271/700 train_loss: 0.827946, train_acc: 61.580882
+287/700 train_loss: 0.814196, train_acc: 62.434896
+303/700 train_loss: 0.797831, train_acc: 63.363487
+319/700 train_loss: 0.787572, train_acc: 63.789062
+335/700 train_loss: 0.778098, train_acc: 64.360119
+351/700 train_loss: 0.767894, train_acc: 64.914773
+367/700 train_loss: 0.758002, train_acc: 65.455163
+383/700 train_loss: 0.749924, train_acc: 65.885417
+399/700 train_loss: 0.741794, train_acc: 66.390625
+415/700 train_loss: 0.736320, train_acc: 66.751803
+431/700 train_loss: 0.731750, train_acc: 67.013889
+447/700 train_loss: 0.725580, train_acc: 67.354911
+463/700 train_loss: 0.717698, train_acc: 67.793642
+479/700 train_loss: 0.709331, train_acc: 68.229167
+495/700 train_loss: 0.704016, train_acc: 68.548387
+511/700 train_loss: 0.697629, train_acc: 68.859863
+527/700 train_loss: 0.692176, train_acc: 69.199811
+543/700 train_loss: 0.687985, train_acc: 69.439338
+559/700 train_loss: 0.684763, train_acc: 69.654018
+575/700 train_loss: 0.677237, train_acc: 70.106337
+591/700 train_loss: 0.672126, train_acc: 70.354730
+607/700 train_loss: 0.666561, train_acc: 70.641447
+623/700 train_loss: 0.662004, train_acc: 70.873397
+639/700 train_loss: 0.657895, train_acc: 71.103516
+655/700 train_loss: 0.652887, train_acc: 71.389101
+671/700 train_loss: 0.648374, train_acc: 71.651786
+687/700 train_loss: 0.644297, train_acc: 71.820494
+End of 1 train_loss: 0.6408, train_acc: 71.9911, val_loss: 0.4855, val_acc: 81.3988, f1_score: 0.8054
+new best model saved.
+Epoch 2------------------------------------------------------------
+15/700 train_loss: 0.516638, train_acc: 78.125000
+31/700 train_loss: 0.478223, train_acc: 80.664062
+47/700 train_loss: 0.482585, train_acc: 81.510417
+63/700 train_loss: 0.484741, train_acc: 81.933594
+79/700 train_loss: 0.484289, train_acc: 81.796875
+95/700 train_loss: 0.471446, train_acc: 82.421875
+111/700 train_loss: 0.479870, train_acc: 81.529018
+127/700 train_loss: 0.478491, train_acc: 81.640625
+143/700 train_loss: 0.476938, train_acc: 81.510417
+159/700 train_loss: 0.474591, train_acc: 81.289062
+175/700 train_loss: 0.472680, train_acc: 81.214489
+191/700 train_loss: 0.464789, train_acc: 81.315104
+207/700 train_loss: 0.462696, train_acc: 81.430288
+223/700 train_loss: 0.458272, train_acc: 81.696429
+239/700 train_loss: 0.453702, train_acc: 81.953125
+255/700 train_loss: 0.447218, train_acc: 82.202148
+271/700 train_loss: 0.443339, train_acc: 82.329963
+287/700 train_loss: 0.436770, train_acc: 82.595486
+303/700 train_loss: 0.429034, train_acc: 82.874178
+319/700 train_loss: 0.422456, train_acc: 83.144531
+335/700 train_loss: 0.418801, train_acc: 83.296131
+351/700 train_loss: 0.414943, train_acc: 83.504972
+367/700 train_loss: 0.411077, train_acc: 83.695652
+383/700 train_loss: 0.406116, train_acc: 83.935547
+399/700 train_loss: 0.399537, train_acc: 84.265625
+415/700 train_loss: 0.398810, train_acc: 84.359976
+431/700 train_loss: 0.396876, train_acc: 84.403935
+447/700 train_loss: 0.394246, train_acc: 84.542411
+463/700 train_loss: 0.389821, train_acc: 84.765625
+479/700 train_loss: 0.383056, train_acc: 85.026042
+495/700 train_loss: 0.380944, train_acc: 85.143649
+511/700 train_loss: 0.377557, train_acc: 85.253906
+527/700 train_loss: 0.375120, train_acc: 85.345644
+543/700 train_loss: 0.372861, train_acc: 85.443474
+559/700 train_loss: 0.371852, train_acc: 85.546875
+575/700 train_loss: 0.367550, train_acc: 85.774740
+591/700 train_loss: 0.365262, train_acc: 85.863598
+607/700 train_loss: 0.361784, train_acc: 85.978618
+623/700 train_loss: 0.359561, train_acc: 86.057692
+639/700 train_loss: 0.358047, train_acc: 86.132812
+655/700 train_loss: 0.354952, train_acc: 86.299543
+671/700 train_loss: 0.352885, train_acc: 86.383929
+687/700 train_loss: 0.351041, train_acc: 86.437137
+End of 2 train_loss: 0.3495, train_acc: 86.5000, val_loss: 0.5314, val_acc: 82.0685, f1_score: 0.8113
+new best model saved.
+Epoch 3------------------------------------------------------------
+15/700 train_loss: 0.291429, train_acc: 88.671875
+31/700 train_loss: 0.273054, train_acc: 89.843750
+47/700 train_loss: 0.297171, train_acc: 89.062500
+63/700 train_loss: 0.303953, train_acc: 88.867188
+79/700 train_loss: 0.307272, train_acc: 88.906250
+95/700 train_loss: 0.295479, train_acc: 89.388021
+111/700 train_loss: 0.304319, train_acc: 88.950893
+127/700 train_loss: 0.302872, train_acc: 88.769531
+143/700 train_loss: 0.299272, train_acc: 88.845486
+159/700 train_loss: 0.293957, train_acc: 88.984375
+175/700 train_loss: 0.290215, train_acc: 89.133523
+191/700 train_loss: 0.281648, train_acc: 89.518229
+207/700 train_loss: 0.276106, train_acc: 89.723558
+223/700 train_loss: 0.273656, train_acc: 89.787946
+239/700 train_loss: 0.273334, train_acc: 89.921875
+255/700 train_loss: 0.272235, train_acc: 89.990234
+271/700 train_loss: 0.268798, train_acc: 90.142463
+287/700 train_loss: 0.261374, train_acc: 90.429688
+303/700 train_loss: 0.254272, train_acc: 90.645559
+319/700 train_loss: 0.247934, train_acc: 90.878906
+335/700 train_loss: 0.242720, train_acc: 91.090030
+351/700 train_loss: 0.238074, train_acc: 91.281960
+367/700 train_loss: 0.237144, train_acc: 91.389266
+383/700 train_loss: 0.234900, train_acc: 91.471354
+399/700 train_loss: 0.230321, train_acc: 91.687500
+415/700 train_loss: 0.228264, train_acc: 91.736779
+431/700 train_loss: 0.225432, train_acc: 91.840278
+447/700 train_loss: 0.223506, train_acc: 91.922433
+463/700 train_loss: 0.221687, train_acc: 91.998922
+479/700 train_loss: 0.216496, train_acc: 92.226562
+495/700 train_loss: 0.213338, train_acc: 92.351310
+511/700 train_loss: 0.210083, train_acc: 92.480469
+527/700 train_loss: 0.209591, train_acc: 92.495265
+543/700 train_loss: 0.208191, train_acc: 92.555147
+559/700 train_loss: 0.208216, train_acc: 92.589286
+575/700 train_loss: 0.206600, train_acc: 92.675781
+591/700 train_loss: 0.204791, train_acc: 92.747044
+607/700 train_loss: 0.202979, train_acc: 92.814556
+623/700 train_loss: 0.200906, train_acc: 92.868590
+639/700 train_loss: 0.201003, train_acc: 92.880859
+655/700 train_loss: 0.198725, train_acc: 92.997332
+671/700 train_loss: 0.197852, train_acc: 93.015253
+687/700 train_loss: 0.196586, train_acc: 93.068677
+End of 3 train_loss: 0.1953, train_acc: 93.1071, val_loss: 0.6723, val_acc: 80.8036, f1_score: 0.8018
+Epoch 4------------------------------------------------------------
+15/700 train_loss: 0.174128, train_acc: 93.359375
+31/700 train_loss: 0.146255, train_acc: 94.921875
+47/700 train_loss: 0.159891, train_acc: 95.052083
+63/700 train_loss: 0.169870, train_acc: 94.531250
+79/700 train_loss: 0.186617, train_acc: 93.828125
+95/700 train_loss: 0.177162, train_acc: 94.075521
+111/700 train_loss: 0.171941, train_acc: 94.252232
+127/700 train_loss: 0.168003, train_acc: 94.335938
+143/700 train_loss: 0.168513, train_acc: 94.314236
+159/700 train_loss: 0.164744, train_acc: 94.335938
+175/700 train_loss: 0.161083, train_acc: 94.566761
+191/700 train_loss: 0.154999, train_acc: 94.759115
+207/700 train_loss: 0.148975, train_acc: 94.951923
+223/700 train_loss: 0.147325, train_acc: 94.921875
+239/700 train_loss: 0.146984, train_acc: 94.947917
+255/700 train_loss: 0.147653, train_acc: 94.921875
+271/700 train_loss: 0.145040, train_acc: 95.036765
+287/700 train_loss: 0.141795, train_acc: 95.138889
+303/700 train_loss: 0.136905, train_acc: 95.312500
+319/700 train_loss: 0.134198, train_acc: 95.429688
+335/700 train_loss: 0.133800, train_acc: 95.461310
+351/700 train_loss: 0.131423, train_acc: 95.507812
+367/700 train_loss: 0.132031, train_acc: 95.533288
+383/700 train_loss: 0.130489, train_acc: 95.589193
+399/700 train_loss: 0.129897, train_acc: 95.578125
+415/700 train_loss: 0.127802, train_acc: 95.688101
+431/700 train_loss: 0.126227, train_acc: 95.732060
+447/700 train_loss: 0.125993, train_acc: 95.731027
+463/700 train_loss: 0.124185, train_acc: 95.824353
+479/700 train_loss: 0.122128, train_acc: 95.885417
+495/700 train_loss: 0.120948, train_acc: 95.929940
+511/700 train_loss: 0.120586, train_acc: 95.947266
+527/700 train_loss: 0.120938, train_acc: 95.928030
+543/700 train_loss: 0.120747, train_acc: 95.967371
+559/700 train_loss: 0.121838, train_acc: 95.926339
+575/700 train_loss: 0.121180, train_acc: 95.963542
+591/700 train_loss: 0.120102, train_acc: 95.998733
+607/700 train_loss: 0.119029, train_acc: 96.011513
+623/700 train_loss: 0.117601, train_acc: 96.063702
+639/700 train_loss: 0.117975, train_acc: 96.054688
+655/700 train_loss: 0.117386, train_acc: 96.084223
+671/700 train_loss: 0.116600, train_acc: 96.103051
+687/700 train_loss: 0.115715, train_acc: 96.139172
+End of 4 train_loss: 0.1158, train_acc: 96.1161, val_loss: 0.7027, val_acc: 82.0685, f1_score: 0.8142
+Epoch 5------------------------------------------------------------
+15/700 train_loss: 0.134744, train_acc: 94.921875
+31/700 train_loss: 0.110763, train_acc: 96.289062
+47/700 train_loss: 0.102189, train_acc: 96.875000
+63/700 train_loss: 0.104857, train_acc: 96.972656
+79/700 train_loss: 0.105369, train_acc: 96.953125
+95/700 train_loss: 0.101347, train_acc: 96.940104
+111/700 train_loss: 0.093382, train_acc: 97.209821
+127/700 train_loss: 0.092004, train_acc: 97.412109
+143/700 train_loss: 0.089701, train_acc: 97.482639
+159/700 train_loss: 0.086891, train_acc: 97.460938
+175/700 train_loss: 0.085485, train_acc: 97.478693
+191/700 train_loss: 0.082896, train_acc: 97.526042
+207/700 train_loss: 0.079753, train_acc: 97.596154
+223/700 train_loss: 0.079614, train_acc: 97.600446
+239/700 train_loss: 0.080273, train_acc: 97.604167
+255/700 train_loss: 0.078088, train_acc: 97.631836
+271/700 train_loss: 0.079405, train_acc: 97.541360
+287/700 train_loss: 0.077368, train_acc: 97.569444
+303/700 train_loss: 0.075642, train_acc: 97.594572
+319/700 train_loss: 0.073193, train_acc: 97.695312
+335/700 train_loss: 0.075548, train_acc: 97.600446
+351/700 train_loss: 0.074445, train_acc: 97.638494
+367/700 train_loss: 0.073935, train_acc: 97.690217
+383/700 train_loss: 0.074603, train_acc: 97.656250
+399/700 train_loss: 0.074300, train_acc: 97.656250
+415/700 train_loss: 0.073337, train_acc: 97.701322
+431/700 train_loss: 0.073740, train_acc: 97.699653
+447/700 train_loss: 0.071555, train_acc: 97.781808
+463/700 train_loss: 0.070626, train_acc: 97.804418
+479/700 train_loss: 0.069287, train_acc: 97.825521
+495/700 train_loss: 0.069225, train_acc: 97.845262
+511/700 train_loss: 0.068462, train_acc: 97.839355
+527/700 train_loss: 0.069295, train_acc: 97.798295
+543/700 train_loss: 0.069697, train_acc: 97.794118
+559/700 train_loss: 0.069649, train_acc: 97.779018
+575/700 train_loss: 0.070829, train_acc: 97.710503
+591/700 train_loss: 0.070846, train_acc: 97.698480
+607/700 train_loss: 0.070144, train_acc: 97.717928
+623/700 train_loss: 0.070710, train_acc: 97.676282
+639/700 train_loss: 0.070359, train_acc: 97.666016
+655/700 train_loss: 0.070153, train_acc: 97.675305
+671/700 train_loss: 0.070462, train_acc: 97.684152
+687/700 train_loss: 0.070446, train_acc: 97.656250
+End of 5 train_loss: 0.0698, train_acc: 97.6786, val_loss: 0.7788, val_acc: 82.0685, f1_score: 0.8133
+Epoch 6------------------------------------------------------------
+15/700 train_loss: 0.034068, train_acc: 98.828125
+31/700 train_loss: 0.053598, train_acc: 98.632812
+47/700 train_loss: 0.078369, train_acc: 97.656250
+63/700 train_loss: 0.082125, train_acc: 97.656250
+79/700 train_loss: 0.080207, train_acc: 97.656250
+95/700 train_loss: 0.072157, train_acc: 97.851562
+111/700 train_loss: 0.068995, train_acc: 97.879464
+127/700 train_loss: 0.067525, train_acc: 97.949219
+143/700 train_loss: 0.068739, train_acc: 97.916667
+159/700 train_loss: 0.065995, train_acc: 97.890625
+175/700 train_loss: 0.066954, train_acc: 97.940341
+191/700 train_loss: 0.065090, train_acc: 97.949219
+207/700 train_loss: 0.064069, train_acc: 98.016827
+223/700 train_loss: 0.063448, train_acc: 97.991071
+239/700 train_loss: 0.061386, train_acc: 98.072917
+255/700 train_loss: 0.062269, train_acc: 98.046875
+271/700 train_loss: 0.060322, train_acc: 98.092831
+287/700 train_loss: 0.060544, train_acc: 98.111979
+303/700 train_loss: 0.060027, train_acc: 98.129112
+319/700 train_loss: 0.059413, train_acc: 98.125000
+335/700 train_loss: 0.058762, train_acc: 98.139881
+351/700 train_loss: 0.059741, train_acc: 98.135653
+367/700 train_loss: 0.060036, train_acc: 98.097826
+383/700 train_loss: 0.059710, train_acc: 98.095703
+399/700 train_loss: 0.060719, train_acc: 98.031250
+415/700 train_loss: 0.060992, train_acc: 98.046875
+431/700 train_loss: 0.061478, train_acc: 98.061343
+447/700 train_loss: 0.060482, train_acc: 98.088728
+463/700 train_loss: 0.059974, train_acc: 98.087284
+479/700 train_loss: 0.060037, train_acc: 98.085938
+495/700 train_loss: 0.060190, train_acc: 98.084677
+511/700 train_loss: 0.060360, train_acc: 98.046875
+527/700 train_loss: 0.060437, train_acc: 98.070549
+543/700 train_loss: 0.061327, train_acc: 98.046875
+559/700 train_loss: 0.061603, train_acc: 98.035714
+575/700 train_loss: 0.061820, train_acc: 98.036024
+591/700 train_loss: 0.060972, train_acc: 98.078547
+607/700 train_loss: 0.060244, train_acc: 98.118832
+623/700 train_loss: 0.059995, train_acc: 98.116987
+639/700 train_loss: 0.059177, train_acc: 98.134766
+655/700 train_loss: 0.058294, train_acc: 98.170732
+671/700 train_loss: 0.058307, train_acc: 98.177083
+687/700 train_loss: 0.057794, train_acc: 98.192224
+End of 6 train_loss: 0.0573, train_acc: 98.2054, val_loss: 0.8046, val_acc: 82.7381, f1_score: 0.8192
+new best model saved.
+Epoch 7------------------------------------------------------------
+15/700 train_loss: 0.034623, train_acc: 98.828125
+31/700 train_loss: 0.061580, train_acc: 98.437500
+47/700 train_loss: 0.074218, train_acc: 98.046875
+63/700 train_loss: 0.069874, train_acc: 98.046875
+79/700 train_loss: 0.067963, train_acc: 97.968750
+95/700 train_loss: 0.062778, train_acc: 98.177083
+111/700 train_loss: 0.066720, train_acc: 97.879464
+127/700 train_loss: 0.063895, train_acc: 98.046875
+143/700 train_loss: 0.063916, train_acc: 98.003472
+159/700 train_loss: 0.065208, train_acc: 98.007812
+175/700 train_loss: 0.066456, train_acc: 97.904830
+191/700 train_loss: 0.069456, train_acc: 97.753906
+207/700 train_loss: 0.067344, train_acc: 97.866587
+223/700 train_loss: 0.064525, train_acc: 97.935268
+239/700 train_loss: 0.062359, train_acc: 98.020833
+255/700 train_loss: 0.061054, train_acc: 98.071289
+271/700 train_loss: 0.059534, train_acc: 98.138787
+287/700 train_loss: 0.057462, train_acc: 98.220486
+303/700 train_loss: 0.055164, train_acc: 98.293586
+319/700 train_loss: 0.053456, train_acc: 98.320312
+335/700 train_loss: 0.051925, train_acc: 98.363095
+351/700 train_loss: 0.050079, train_acc: 98.419744
+367/700 train_loss: 0.050450, train_acc: 98.420516
+383/700 train_loss: 0.048863, train_acc: 98.470052
+399/700 train_loss: 0.049241, train_acc: 98.421875
+415/700 train_loss: 0.049006, train_acc: 98.452524
+431/700 train_loss: 0.047853, train_acc: 98.480903
+447/700 train_loss: 0.048072, train_acc: 98.479353
+463/700 train_loss: 0.048662, train_acc: 98.477909
+479/700 train_loss: 0.047254, train_acc: 98.528646
+495/700 train_loss: 0.046985, train_acc: 98.538306
+511/700 train_loss: 0.045943, train_acc: 98.571777
+527/700 train_loss: 0.045191, train_acc: 98.603220
+543/700 train_loss: 0.045458, train_acc: 98.621324
+559/700 train_loss: 0.044747, train_acc: 98.638393
+575/700 train_loss: 0.044682, train_acc: 98.632812
+591/700 train_loss: 0.044369, train_acc: 98.648649
+607/700 train_loss: 0.043772, train_acc: 98.663651
+623/700 train_loss: 0.044218, train_acc: 98.647837
+639/700 train_loss: 0.044041, train_acc: 98.642578
+655/700 train_loss: 0.043638, train_acc: 98.656631
+671/700 train_loss: 0.044282, train_acc: 98.660714
+687/700 train_loss: 0.044170, train_acc: 98.673692
+End of 7 train_loss: 0.0438, train_acc: 98.6875, val_loss: 0.9063, val_acc: 80.8780, f1_score: 0.8019
+Epoch 8------------------------------------------------------------
+15/700 train_loss: 0.061620, train_acc: 97.656250
+31/700 train_loss: 0.062335, train_acc: 97.656250
+47/700 train_loss: 0.057452, train_acc: 97.916667
+63/700 train_loss: 0.054245, train_acc: 98.144531
+79/700 train_loss: 0.052495, train_acc: 98.125000
+95/700 train_loss: 0.051571, train_acc: 98.177083
+111/700 train_loss: 0.049932, train_acc: 98.214286
+127/700 train_loss: 0.050032, train_acc: 98.291016
+143/700 train_loss: 0.048355, train_acc: 98.263889
+159/700 train_loss: 0.048095, train_acc: 98.281250
+175/700 train_loss: 0.047066, train_acc: 98.259943
+191/700 train_loss: 0.044770, train_acc: 98.339844
+207/700 train_loss: 0.043220, train_acc: 98.407452
+223/700 train_loss: 0.041153, train_acc: 98.493304
+239/700 train_loss: 0.040614, train_acc: 98.489583
+255/700 train_loss: 0.040015, train_acc: 98.510742
+271/700 train_loss: 0.041072, train_acc: 98.506434
+287/700 train_loss: 0.039546, train_acc: 98.589410
+303/700 train_loss: 0.038019, train_acc: 98.643092
+319/700 train_loss: 0.037208, train_acc: 98.691406
+335/700 train_loss: 0.036960, train_acc: 98.679315
+351/700 train_loss: 0.035967, train_acc: 98.721591
+367/700 train_loss: 0.036238, train_acc: 98.692255
+383/700 train_loss: 0.037412, train_acc: 98.681641
+399/700 train_loss: 0.038446, train_acc: 98.671875
+415/700 train_loss: 0.038435, train_acc: 98.677885
+431/700 train_loss: 0.039445, train_acc: 98.654514
+447/700 train_loss: 0.039489, train_acc: 98.632812
+463/700 train_loss: 0.040037, train_acc: 98.639547
+479/700 train_loss: 0.039628, train_acc: 98.645833
+495/700 train_loss: 0.040695, train_acc: 98.626512
+511/700 train_loss: 0.039853, train_acc: 98.657227
+527/700 train_loss: 0.041056, train_acc: 98.626894
+543/700 train_loss: 0.041171, train_acc: 98.632812
+559/700 train_loss: 0.041535, train_acc: 98.638393
+575/700 train_loss: 0.041624, train_acc: 98.621962
+591/700 train_loss: 0.041516, train_acc: 98.627534
+607/700 train_loss: 0.041437, train_acc: 98.622533
+623/700 train_loss: 0.041514, train_acc: 98.617788
+639/700 train_loss: 0.040969, train_acc: 98.632812
+655/700 train_loss: 0.040932, train_acc: 98.628049
+671/700 train_loss: 0.040481, train_acc: 98.642113
+687/700 train_loss: 0.041062, train_acc: 98.646439
+End of 8 train_loss: 0.0407, train_acc: 98.6607, val_loss: 0.9389, val_acc: 81.1756, f1_score: 0.8035
+Epoch 9------------------------------------------------------------
+15/700 train_loss: 0.026479, train_acc: 99.218750
+31/700 train_loss: 0.032292, train_acc: 99.023438
+47/700 train_loss: 0.036263, train_acc: 98.828125
+63/700 train_loss: 0.042293, train_acc: 98.925781
+79/700 train_loss: 0.044270, train_acc: 98.750000
+95/700 train_loss: 0.039532, train_acc: 98.893229
+111/700 train_loss: 0.040109, train_acc: 98.716518
+127/700 train_loss: 0.040379, train_acc: 98.681641
+143/700 train_loss: 0.038859, train_acc: 98.784722
+159/700 train_loss: 0.038596, train_acc: 98.828125
+175/700 train_loss: 0.038598, train_acc: 98.792614
+191/700 train_loss: 0.036833, train_acc: 98.860677
+207/700 train_loss: 0.036678, train_acc: 98.858173
+223/700 train_loss: 0.035161, train_acc: 98.883929
+239/700 train_loss: 0.035414, train_acc: 98.906250
+255/700 train_loss: 0.033902, train_acc: 98.974609
+271/700 train_loss: 0.033105, train_acc: 98.988971
+287/700 train_loss: 0.033006, train_acc: 98.980035
+303/700 train_loss: 0.032197, train_acc: 98.992599
+319/700 train_loss: 0.033558, train_acc: 98.984375
+335/700 train_loss: 0.034038, train_acc: 98.995536
+351/700 train_loss: 0.033316, train_acc: 99.005682
+367/700 train_loss: 0.032212, train_acc: 99.048913
+383/700 train_loss: 0.031320, train_acc: 99.072266
+399/700 train_loss: 0.033282, train_acc: 98.968750
+415/700 train_loss: 0.032856, train_acc: 98.993389
+431/700 train_loss: 0.033339, train_acc: 99.016204
+447/700 train_loss: 0.033256, train_acc: 99.037388
+463/700 train_loss: 0.033503, train_acc: 99.016703
+479/700 train_loss: 0.032647, train_acc: 99.049479
+495/700 train_loss: 0.032825, train_acc: 99.054940
+511/700 train_loss: 0.031902, train_acc: 99.084473
+527/700 train_loss: 0.031407, train_acc: 99.100379
+543/700 train_loss: 0.031838, train_acc: 99.103860
+559/700 train_loss: 0.031231, train_acc: 99.118304
+575/700 train_loss: 0.030817, train_acc: 99.121094
+591/700 train_loss: 0.030140, train_acc: 99.144848
+607/700 train_loss: 0.030263, train_acc: 99.126234
+623/700 train_loss: 0.030871, train_acc: 99.118590
+639/700 train_loss: 0.032002, train_acc: 99.091797
+655/700 train_loss: 0.032343, train_acc: 99.075838
+671/700 train_loss: 0.031836, train_acc: 99.088542
+687/700 train_loss: 0.031314, train_acc: 99.109738
+End of 9 train_loss: 0.0308, train_acc: 99.1250, val_loss: 0.9104, val_acc: 81.7708, f1_score: 0.8108
+Epoch 10------------------------------------------------------------
+15/700 train_loss: 0.035471, train_acc: 99.218750
+31/700 train_loss: 0.023988, train_acc: 99.414062
+47/700 train_loss: 0.038084, train_acc: 98.958333
+63/700 train_loss: 0.033967, train_acc: 99.023438
+79/700 train_loss: 0.033961, train_acc: 98.984375
+95/700 train_loss: 0.031689, train_acc: 99.023438
+111/700 train_loss: 0.031467, train_acc: 98.995536
+127/700 train_loss: 0.029780, train_acc: 99.023438
+143/700 train_loss: 0.030707, train_acc: 99.045139
+159/700 train_loss: 0.028841, train_acc: 99.140625
+175/700 train_loss: 0.028419, train_acc: 99.112216
+191/700 train_loss: 0.028219, train_acc: 99.121094
+207/700 train_loss: 0.028210, train_acc: 99.158654
+223/700 train_loss: 0.026660, train_acc: 99.218750
+239/700 train_loss: 0.026048, train_acc: 99.244792
+255/700 train_loss: 0.025065, train_acc: 99.267578
+271/700 train_loss: 0.024804, train_acc: 99.264706
+287/700 train_loss: 0.024575, train_acc: 99.240451
+303/700 train_loss: 0.023560, train_acc: 99.280428
+319/700 train_loss: 0.022678, train_acc: 99.316406
+335/700 train_loss: 0.021734, train_acc: 99.348958
+351/700 train_loss: 0.021913, train_acc: 99.343040
+367/700 train_loss: 0.021895, train_acc: 99.320652
+383/700 train_loss: 0.021284, train_acc: 99.348958
+399/700 train_loss: 0.021075, train_acc: 99.359375
+415/700 train_loss: 0.021809, train_acc: 99.308894
+431/700 train_loss: 0.022157, train_acc: 99.305556
+447/700 train_loss: 0.022326, train_acc: 99.316406
+463/700 train_loss: 0.022430, train_acc: 99.313039
+479/700 train_loss: 0.022818, train_acc: 99.270833
+495/700 train_loss: 0.022680, train_acc: 99.281754
+511/700 train_loss: 0.022684, train_acc: 99.279785
+527/700 train_loss: 0.022794, train_acc: 99.266098
+543/700 train_loss: 0.022712, train_acc: 99.264706
+559/700 train_loss: 0.023890, train_acc: 99.229911
+575/700 train_loss: 0.024421, train_acc: 99.207899
+591/700 train_loss: 0.024484, train_acc: 99.208193
+607/700 train_loss: 0.024677, train_acc: 99.187911
+623/700 train_loss: 0.024294, train_acc: 99.198718
+639/700 train_loss: 0.024248, train_acc: 99.199219
+655/700 train_loss: 0.024774, train_acc: 99.190168
+671/700 train_loss: 0.024570, train_acc: 99.190848
+687/700 train_loss: 0.024368, train_acc: 99.200581
+End of 10 train_loss: 0.0244, train_acc: 99.2054, val_loss: 0.9871, val_acc: 82.7381, f1_score: 0.8182
+Training ended with 10 epochs.
+Loading best checkpoint from  saved_models/MAMS/train/best_model.pt
+Evaluation Results: test_loss:0.7482267618179321, test_acc:84.52380952380952, test_f1:0.8374291096476888
