@@ -20,7 +20,7 @@ CUDA_VISIBLE_DEVICES=0 python3 -u bert_train.py \
 	--att_dropout 0.0 \
 	--num_layer 2 \
 	--bert_out_dim 100 \
-	--dep_dim 80 \
+	--dep_dim 100 \
 	--max_len 90 \
 	--data_dir $source_dir/$exp_dataset \
 	--vocab_dir $source_dir/$exp_dataset \
