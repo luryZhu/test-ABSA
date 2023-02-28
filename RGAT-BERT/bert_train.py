@@ -112,6 +112,7 @@ def evaluate(model, data_loader):
         predictions += pred
         labels += label
         val_step += 1
+        print(val_loss,val_acc,predictions,labels)
     # f1 score
     f1_score = metrics.f1_score(labels, predictions, average="macro")
     return val_loss / val_step, val_acc / val_step, f1_score
