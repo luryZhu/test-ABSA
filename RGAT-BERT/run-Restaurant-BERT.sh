@@ -5,7 +5,7 @@ save_dir=saved_models
 
 exp_setting=train
 #exp_parser=Stanza/Biaffine/LAL/Merge
-exp_dataset=new_data/$exp_parser
+exp_dataset=new_data/Restaurants/$exp_parser
 
 ############# Restaurants acc:86.68 f1:80.92 #################
 
