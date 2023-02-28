@@ -71,7 +71,7 @@ class ABSATrainer(object):
         self.model.train()
         self.optimizer.zero_grad()
         logits, _ = self.model(inputs)
-        loss = F.cross_entropy(logits, label, reduction="mean")
+        loss = F.cross_entropy(logits+1e-8, label, reduction="mean")
         assert torch.isnan(loss).sum() == 0, print(loss)
         corrects = (torch.max(logits, 1)[1].view(label.size()).data == label.data).sum()
         acc = 100.0 * np.float(corrects) / label.size()[0]
@@ -80,7 +80,7 @@ class ABSATrainer(object):
         # backward
         loss.backward()
 
-        torch.nn.utils.clip_grad_norm_(self.model.parameters, max_norm=1, norm_type=2)
+        # torch.nn.utils.clip_grad_norm_(self.model.parameters, max_norm=1, norm_type=2)
 
         self.optimizer.step()
         return loss.data, acc
