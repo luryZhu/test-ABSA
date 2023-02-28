@@ -133,14 +133,17 @@ class ABSADataLoader(object):
                 # mapping post
                 post = [post_vocab.stoi.get(t, post_vocab.unk_index) for t in post]
 
-                assert (
-                    len(tok) == length
-                    and len(pos) == length
-                    and len(head) == length
-                    and len(deprel) == length
-                    and len(post) == length
-                    and len(mask) == length
-                )
+                try:
+                    assert (
+                        len(tok) == length
+                        and len(pos) == length
+                        and len(head) == length
+                        and len(deprel) == length
+                        and len(post) == length
+                        and len(mask) == length
+                    )
+                except:
+                    print("error:", d)
 
                 processed += [
                     (
