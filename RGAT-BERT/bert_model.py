@@ -36,7 +36,7 @@ class RGATABSA(nn.Module):
             # print("logit has nan", logits)
             print("alter nan to 0", logits)
             # logits = torch.where(torch.isnan(logits), torch.full_like(logits, 0), logits)
-            logits = torch.nan_to_num(logits, nan=0)
+            logits = torch.nan_to_num(logits, nan=1e-8)
             print("alter nan to 0", logits)
         return logits, outputs
 
