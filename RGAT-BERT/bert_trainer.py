@@ -84,7 +84,7 @@ class ABSATrainer(object):
         # backward
         loss.backward()
 
-        # torch.nn.utils.clip_grad_norm_(self.model.parameters, max_norm=1, norm_type=2)
+        torch.nn.utils.clip_grad_norm_(self.model.parameters(), max_norm=1, norm_type=2)
 
         self.optimizer.step()
         return loss.data, acc
