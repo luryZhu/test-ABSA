@@ -28,6 +28,10 @@ class RGATABSA(nn.Module):
         outputs = self.enc(inputs)
         outputs = self.dropout(outputs)
         logits = self.classifier(outputs)
+        try:
+            assert torch.isnan(logits).sum() == 0
+        except:
+            print("logit has nan", logits)
         return logits, outputs
 
 
