@@ -72,6 +72,7 @@ class ABSATrainer(object):
         self.optimizer.zero_grad()
         logits, _ = self.model(inputs)
         loss = F.cross_entropy(logits, label, reduction="mean")
+        assert torch.isnan(loss).sum() == 0, print(loss)
         corrects = (torch.max(logits, 1)[1].view(label.size()).data == label.data).sum()
         acc = 100.0 * np.float(corrects) / label.size()[0]
 
