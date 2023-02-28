@@ -31,6 +31,8 @@ class RGATABSA(nn.Module):
         try:
             assert torch.isnan(logits).sum() == 0
         except:
+            print("inputs has nan", torch.any(torch.isnan(inputs)))
+            print("outputs has nan", outputs)
             print("logit has nan", logits)
         return logits, outputs
 
