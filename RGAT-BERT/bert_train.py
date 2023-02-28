@@ -112,7 +112,7 @@ def evaluate(model, data_loader):
         predictions += pred
         labels += label
         val_step += 1
-        print(val_loss,val_acc,predictions,labels)
+        # print(val_loss,val_acc,predictions,labels)
     # f1 score
     f1_score = metrics.f1_score(labels, predictions, average="macro")
     return val_loss / val_step, val_acc / val_step, f1_score
@@ -143,6 +143,7 @@ for epoch in range(1, args.num_epoch + 1):
         train_loss += loss
         train_acc += acc
         train_step += 1
+        print(loss, acc, train_loss, train_acc)
         if train_step % args.log_step == 0:
             print(
                 "{}/{} train_loss: {:.6f}, train_acc: {:.6f}".format(
