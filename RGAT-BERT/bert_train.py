@@ -144,6 +144,11 @@ for epoch in range(1, args.num_epoch + 1):
         train_acc += acc
         train_step += 1
         print(loss, acc, train_loss, train_acc)
+        try:
+            assert torch.isnan(loss).sum() == 0
+        except:
+            print(i, batch)
+
         if train_step % args.log_step == 0:
             print(
                 "{}/{} train_loss: {:.6f}, train_acc: {:.6f}".format(
