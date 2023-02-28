@@ -15,7 +15,7 @@ if [ ! -d "$exp_path" ]; then
 fi
 
 CUDA_VISIBLE_DEVICES=0 python3 -u bert_train.py \
-	--lr 1e-5 \
+	--lr 5e-6 \
 	--bert_lr 2e-5 \
 	--input_dropout 0.1 \
 	--att_dropout 0.0 \
@@ -30,4 +30,4 @@ CUDA_VISIBLE_DEVICES=0 python3 -u bert_train.py \
 	--seed 33 \
 	--output_merge "gate" \
 	--reset_pool \
-	--num_epoch 15 2>&1 | tee $exp_path/training.log
+	--num_epoch 10 2>&1 | tee $exp_path/training.log
