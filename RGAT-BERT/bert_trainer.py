@@ -76,8 +76,12 @@ class ABSATrainer(object):
         corrects = (torch.max(logits, 1)[1].view(label.size()).data == label.data).sum()
         acc = 100.0 * np.float(corrects) / label.size()[0]
 
+
         # backward
         loss.backward()
+
+        torch.nn.utils.clip_grad_norm(self.model.parameters, max_norm=1, norm_type=2)
+
         self.optimizer.step()
         return loss.data, acc
 
