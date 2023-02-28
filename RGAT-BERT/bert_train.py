@@ -143,7 +143,7 @@ for epoch in range(1, args.num_epoch + 1):
         train_loss += loss
         train_acc += acc
         train_step += 1
-        print(loss, acc, train_loss, train_acc)
+        # print(loss, acc, train_loss, train_acc)
         # try:
         #     assert torch.isnan(loss).sum() == 0
         # except:
