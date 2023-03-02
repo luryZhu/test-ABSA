@@ -105,7 +105,7 @@ helper.ensure_dir(model_save_dir, verbose=True)
 def evaluate(model, data_loader, show_attn=False):
     predictions, labels = [], []
     val_loss, val_acc, val_step = 0.0, 0.0, 0
-    bad_case = []  # 记录bad case的列表
+    bad_case, good_case = [],[]  # 记录bad case的列表
     for i, batch in enumerate(data_loader):
         loss, acc, pred, label, _, _, attn_layers = model.predict(batch, show_attn=show_attn)
         val_loss += loss
@@ -118,7 +118,7 @@ def evaluate(model, data_loader, show_attn=False):
             # bad case
             for j in range(len(label)):
                 if label[j] != pred[j]:
-                    print("bad case!")
+                    # print("bad case!")
                     tokens, deps = data_loader.id2tags(batch[0][j], batch[4][j])
                     bad_case.append({
                         "tokens": tokens,
@@ -127,11 +127,23 @@ def evaluate(model, data_loader, show_attn=False):
                         "prediction": pred[j],
                         "attention": attn_layers[j]  # 记录最后一层注意力权重
                     })
+                else:
+                    # add good case
+                    if j%10==0:
+                        tokens, deps = data_loader.id2tags(batch[0][j], batch[4][j])
+                        good_case.append({
+                            "tokens": tokens,
+                            "deps": deps,
+                            "label": label[j],
+                            "prediction": pred[j],
+                            "attention": attn_layers[j]  # 记录最后一层注意力权重
+                        })
+
 
     # f1 score
     f1_score = metrics.f1_score(labels, predictions, average="macro")
-    print("total bad cases:{}".format(len(bad_case)))
-    return val_loss / val_step, val_acc / val_step, f1_score, bad_case
+    print("total bad cases:{}, collect good cases:{}".format(len(bad_case), len(good_case)))
+    return val_loss / val_step, val_acc / val_step, f1_score, bad_case, good_case
 
 
 def _totally_parameters(model):  #
@@ -141,7 +153,7 @@ def _totally_parameters(model):  #
 
 # build model
 trainer = ABSATrainer(args)
-print(trainer.model)
+# print(trainer.model)
 print('# parameters:', _totally_parameters(trainer.model))
 best_path = model_save_dir + "/best_model.pt"
 print("Training Set: {}".format(len(train_batch)))
@@ -167,7 +179,7 @@ for epoch in range(1, args.num_epoch + 1):
                 )
             )
 
-    val_loss, val_acc, val_f1, _ = evaluate(trainer, valid_batch)
+    val_loss, val_acc, val_f1, _, _ = evaluate(trainer, valid_batch)
 
     print(
         "End of {} train_loss: {:.4f}, train_acc: {:.4f}, val_loss: {:.4f}, val_acc: {:.4f}, f1_score: {:.4f}".format(
@@ -199,6 +211,7 @@ print("Training ended with {} epochs.".format(epoch))
 
 print("Loading best checkpoint from ", best_path)
 trainer = torch.load(best_path)
-test_loss, test_acc, test_f1, bad_case = evaluate(trainer, test_batch, show_attn=True)
+test_loss, test_acc, test_f1, bad_case, good_case = evaluate(trainer, test_batch, show_attn=True)
 print("Evaluation Results: test_loss:{}, test_acc:{}, test_f1:{}".format(test_loss, test_acc, test_f1))
-print("bad case:", bad_case)
+print("bad case:", bad_case[0])
+print("good case:", good_case[0])

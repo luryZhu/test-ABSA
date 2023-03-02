@@ -70,6 +70,14 @@ class ABSADataLoader(object):
         )
         return sequence, bert_segments_ids
 
+    def id2tags(self, tokens, deps):
+        vocab = self.vocab
+        # unpack vocab
+        token_vocab, post_vocab, pos_vocab, dep_vocab, pol_vocab = vocab
+        tokens = [token_vocab.itos[i] for i in tokens]
+        deps = [dep_vocab.itos[i] for i in deps]
+        return tokens, deps
+
     def preprocess(self, data, vocab, args):
         # unpack vocab
         token_vocab, post_vocab, pos_vocab, dep_vocab, pol_vocab = vocab
