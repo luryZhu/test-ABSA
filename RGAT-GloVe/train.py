@@ -66,6 +66,7 @@ parser.add_argument(
 parser.add_argument("--shuffle", default=False, action="store_true")
 parser.add_argument("--seed", type=int, default=0)
 parser.add_argument("--tune", default=False, action="store_true")
+# parser.add_argument("--show_attn", default=True)
 args = parser.parse_args()
 
 
@@ -83,19 +84,36 @@ def get_dataloaders(args, vocab):
     return train_batch, valid_batch, test_batch
 
 
-def evaluate(model, data_loader):
+def evaluate(model, data_loader, show_attn=False):
     predictions, labels = [], []
     val_loss, val_acc, val_step = 0.0, 0.0, 0
+    bad_case = []  # 记录bad case的列表
     for i, batch in enumerate(data_loader):
-        loss, acc, pred, label, _, _ = model.predict(batch)
+        loss, acc, pred, label, _, _, attn_layers = model.predict(batch, show_attn=show_attn)
         val_loss += loss
         val_acc += acc
         predictions += pred
         labels += label
         val_step += 1
+        if show_attn:
+            # bad case
+            for j in range(len(label)):
+                if label[j] != pred[j]:
+                    print("bad case!")
+                    tokens, deps = data_loader.id2tags(batch[0][j], batch[4][j])
+                    bad_case.append({
+                        "tokens": tokens,
+                        "deps": deps,
+                        "label": label[j],
+                        "prediction": pred[j],
+                        "attention": attn_layers[j]  # 记录最后一层注意力权重
+                    })
+
     # f1 score
     f1_score = metrics.f1_score(labels, predictions, average="macro")
-    return val_loss / val_step, val_acc / val_step, f1_score
+    print("total bad cases:{}".format(len(bad_case)))
+
+    return val_loss / val_step, val_acc / val_step, f1_score, bad_case
 
 
 def _totally_parameters(model):  #
@@ -151,7 +169,7 @@ def trainmodel(config=None):
                         i, len(train_batch), train_loss / train_step, train_acc / train_step
                     )
                 )
-        val_loss, val_acc, val_f1 = evaluate(trainer, valid_batch)
+        val_loss, val_acc, val_f1, _ = evaluate(trainer, valid_batch)
     
         print(
             "End of {} train_loss: {:.4f}, train_acc: {:.4f}, val_loss: {:.4f}, val_acc: {:.4f}, f1_score: {:.4f}".format(
@@ -195,7 +213,7 @@ def trainmodel(config=None):
     # )
     print("Loading best checkpoints from", best_path + '/best_checkpoint.pt')
     trainer = torch.load(best_path + '/best_checkpoint.pt')
-    test_loss, test_acc, test_f1 = evaluate(trainer, test_batch)
+    test_loss, test_acc, test_f1, bad_case = evaluate(trainer, test_batch, show_attn=True)
     print("Evaluation Results: test_loss:{}, test_acc:{}, test_f1:{}".format(test_loss, test_acc, test_f1))
 
 

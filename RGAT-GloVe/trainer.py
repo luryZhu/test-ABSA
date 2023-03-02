@@ -49,7 +49,7 @@ class ABSATrainer(object):
         # step forward
         self.model.train()
         self.optimizer.zero_grad()
-        logits, _ = self.model(inputs)
+        logits, _, _ = self.model(inputs)
         loss = F.cross_entropy(logits, label, reduction='mean')
         corrects = (torch.max(logits, 1)[1].view(label.size()).data == label.data).sum()
         acc = 100.0 * np.float(corrects) / label.size()[0]
@@ -59,7 +59,7 @@ class ABSATrainer(object):
         self.optimizer.step()
         return loss.data, acc
 
-    def predict(self, batch):
+    def predict(self, batch, show_attn=False):
         # convert to cuda
         batch = [b.cuda() for b in batch]
 
@@ -69,14 +69,14 @@ class ABSATrainer(object):
 
         # forward
         self.model.eval()
-        logits, g_outputs = self.model(inputs)
+        logits, g_outputs, attn_layers = self.model(inputs, show_attn=show_attn)
         loss = F.cross_entropy(logits, label, reduction='mean')
         corrects = (torch.max(logits, 1)[1].view(label.size()).data == label.data).sum()
         acc = 100.0 * np.float(corrects) / label.size()[0]
         predictions = np.argmax(logits.data.cpu().numpy(), axis=1).tolist()
         predprob = F.softmax(logits, dim=1).data.cpu().numpy().tolist()
         
-        return loss.data, acc, predictions, label.data.cpu().numpy().tolist(), predprob, g_outputs.data.cpu().numpy()
+        return loss.data, acc, predictions, label.data.cpu().numpy().tolist(), predprob, g_outputs.data.cpu().numpy(), attn_layers
 
     def show_error(self, batch, vocab=None):
         # convert to cuda

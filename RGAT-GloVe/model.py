@@ -16,10 +16,10 @@ class RGATABSA(nn.Module):
         self.enc = ABSAEncoder(args, emb_matrix=emb_matrix)
         self.classifier = nn.Linear(in_dim, args.num_class)
 
-    def forward(self, inputs):
-        hiddens = self.enc(inputs)
+    def forward(self, inputs, show_attn=False):
+        hiddens, attn_layers = self.enc(inputs, show_attn=show_attn)
         logits = self.classifier(hiddens)
-        return logits, hiddens
+        return logits, hiddens, attn_layers
 
 
 class ABSAEncoder(nn.Module):
@@ -68,7 +68,8 @@ class ABSAEncoder(nn.Module):
         # #################### pooling and fusion modules ###################
         if self.args.pooling.lower() == "attn":
             self.attn = torch.nn.Linear(args.hidden_dim, 1)
-
+        self.attn = torch.nn.Linear(args.hidden_dim, 1) # add attention
+        self.out_attn_map = torch.nn.Linear(args.hidden_dim * 2, 1) # add attention
         if self.args.output_merge.lower() != "none":
             self.inp_map = torch.nn.Linear(args.hidden_dim * 2, args.hidden_dim)
         if self.args.output_merge.lower() == "none":
@@ -93,7 +94,7 @@ class ABSAEncoder(nn.Module):
         torch.nn.init.eye_(self.inp_map.weight)
         torch.nn.init.zeros_(self.inp_map.bias)
 
-    def forward(self, inputs):
+    def forward(self, inputs, show_attn=False):
         tok, asp, pos, head, deprel, post, mask_ori, lengths = inputs  # unpack inputs
         maxlen = max(lengths.data)
 
@@ -134,10 +135,12 @@ class ABSAEncoder(nn.Module):
             sent_out, graph_out = self.encoder(adj=None, inputs=inputs, lengths=lengths)
         elif self.args.model.lower() == "gat":
             sent_out, graph_out = self.encoder(adj=adj, inputs=inputs, lengths=lengths)
-        elif self.args.model.lower() == "rgat":
-            sent_out, graph_out = self.encoder(
-                adj=adj, relation_matrix=label_all, inputs=inputs, lengths=lengths
+        elif self.args.model.lower() == "rgat": # attention added
+            #################################
+            sent_out, graph_out, attn_layers = self.encoder(
+                adj=adj, relation_matrix=label_all, inputs=inputs, lengths=lengths, show_attn=show_attn
             )
+            #################################
         elif self.args.model.lower() == "rgat-noadj":
             sent_out, graph_out = self.encoder(
                 adj=None, relation_matrix=label_all, inputs=inputs, lengths=lengths
@@ -158,6 +161,19 @@ class ABSAEncoder(nn.Module):
             graph_out = (graph_out * mask).sum(dim=1) / asp_wn  # masking
         elif self.args.pooling.lower() == "max":    # max pooling
             graph_out = torch.max(graph_out * mask, dim=1).values
+
+        ####################################################################
+        # #     make masked attn
+        # # self.attn = torch.nn.Linear(args.hidden_dim, 1)
+        # attns = torch.tanh(self.attn(graph_out))
+        # print('attn', attns.size())
+        # for i in range(mask_ori.size(0)):
+        #     for j in range(mask_ori.size(1)):
+        #         if mask_ori[i, j] == 0:
+        #             mask_ori[i, j] = -1e10
+        # attn_pooling = torch.nn.functional.softmax(mask_ori * attns.squeeze(-1), dim=1)
+        ##############################################################################
+        # print('mask_attns', masked_attns.size())
         # elif self.args.pooling.lower() == "attn":
         #     # [B, seq_len, 1]
         #     attns = torch.tanh(self.attn(graph_out))
@@ -203,7 +219,13 @@ class ABSAEncoder(nn.Module):
                 self.out_attn_map(torch.cat([graph_out, sent_out], dim=-1))
             )  # attn merge
             outputs = graph_out * att + (1 - att) * sent_out
-        return outputs
+        #############################################################
+        # # merge attn
+        # attn_merge = torch.sigmoid(
+        #     self.out_attn_map(torch.cat([graph_out, sent_out], dim=-1))
+        # )  # attn merge
+        ###############################################################
+        return outputs, attn_layers
 
 
 class DoubleEncoder(nn.Module):
@@ -270,7 +292,7 @@ class DoubleEncoder(nn.Module):
         rnn_outputs, _ = nn.utils.rnn.pad_packed_sequence(rnn_outputs, batch_first=True)
         return rnn_outputs
 
-    def forward(self, adj, inputs, lengths, relation_matrix=None):
+    def forward(self, adj, inputs, lengths, relation_matrix=None, show_attn=False):
         tok, asp, pos, head, deprel, post, a_mask, seq_len = inputs  # unpack inputs
         # embedding
         word_embs = self.emb(tok)
@@ -293,11 +315,11 @@ class DoubleEncoder(nn.Module):
 
         # Graph encoding 
         inp = sent_output
-        graph_output = self.graph_encoder(
-            inp, mask=mask, src_key_padding_mask=key_padding_mask, structure=dep_relation_embs,
+        graph_output, attn_layers = self.graph_encoder(
+            inp, mask=mask, src_key_padding_mask=key_padding_mask, structure=dep_relation_embs, show_attn=show_attn
         )  # [bsz, seq_len, H]
         graph_output = self.out_map(graph_output)
-        return sent_output, graph_output
+        return sent_output, graph_output, attn_layers
 
 
 def rnn_zero_state(batch_size, hidden_dim, num_layers, bidirectional=True):
