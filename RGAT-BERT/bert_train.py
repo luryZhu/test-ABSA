@@ -1,4 +1,5 @@
 # encoding=utf-8
+import json
 import sys
 sys.path.append('../')
 import torch
@@ -215,3 +216,8 @@ test_loss, test_acc, test_f1, bad_case, good_case = evaluate(trainer, test_batch
 print("Evaluation Results: test_loss:{}, test_acc:{}, test_f1:{}".format(test_loss, test_acc, test_f1))
 print("bad case:", bad_case[0])
 print("good case:", good_case[0])
+with open(model_save_dir + '/good_case.json', 'w') as file:
+    json.dump(good_case, file)
+with open(model_save_dir + '/bad_case.json', 'w') as file:
+    json.dump(good_case, file)
+print("done write cases to", model_save_dir)

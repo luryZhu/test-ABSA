@@ -1,18 +1,23 @@
 #!/usr/bin/env bash
 
 source_dir=../dataset
-save_dir=saved_models
+save_dir=/kaggle/working/
 
-exp_setting=train
+#exp_setting=train
 #exp_parser=Stanza/Biaffine/LAL/Merge
 exp_dataset=new_data/Restaurants/$exp_parser
 
 ############# Restaurants acc:86.68 f1:80.92 #################
 # saved_models/Restaurants/Test
-exp_path=$save_dir/Restaurants/$exp_setting
+exp_path=$save_dir
 if [ ! -d "$exp_path" ]; then
   mkdir -p "$exp_path"
 fi
+
+# params
+# lr=5e-6
+# num_layer=2
+# num_epoch=10
 
 CUDA_VISIBLE_DEVICES=0 python3 -u bert_train.py \
 	--lr 5e-6 \
