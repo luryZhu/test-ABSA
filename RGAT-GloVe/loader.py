@@ -37,13 +37,14 @@ class ABSADataLoader(object):
         self.data = data
         print("{} batches created for {}".format(len(data), filename))
 
-    def id2tags(self, tokens, deps):
+    def id2tags(self, tokens, aspects, deps):
         vocab = self.vocab
         # unpack vocab
         token_vocab, post_vocab, pos_vocab, dep_vocab, pol_vocab = vocab
         tokens = [token_vocab.itos[i] for i in tokens]
+        aspects = [token_vocab.itos[i] for i in aspects]
         deps = [dep_vocab.itos[i] for i in deps]
-        return tokens, deps
+        return tokens, aspects, deps
 
     def preprocess(self, data, vocab, args):
         # unpack vocab

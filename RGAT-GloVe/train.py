@@ -100,13 +100,14 @@ def evaluate(model, data_loader, show_attn=False):
             for j in range(len(label)):
                 if label[j] != pred[j]:
                     print("bad case!")
-                    tokens, deps = data_loader.id2tags(batch[0][j], batch[4][j])
+                    tokens, aspects, deps = data_loader.id2tags(batch[0][j], batch[1][j], batch[4][j])
                     bad_case.append({
                         "tokens": tokens,
+                        "aspects": aspects,
                         "deps": deps,
                         "label": label[j],
                         "prediction": pred[j],
-                        "attention": attn_layers[j].tolist()  # 记录最后一层注意力权重
+                        "attention": attn_layers[j].tolist(),  # 记录最后一层注意力权重
                     })
 
     # f1 score
