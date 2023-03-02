@@ -103,7 +103,19 @@ model_save_dir = args.save_dir
 helper.ensure_dir(model_save_dir, verbose=True)
 
 
+
+
 def evaluate(model, data_loader, show_attn=False):
+    def get_case(batch, j):
+        tokens, aspects, deps = data_loader.id2tags(batch[0][j], batch[1][j], batch[4][j])
+        return {
+            "tokens": tokens,
+            "aspects": aspects,
+            "deps": deps,
+            "label": label[j],
+            "prediction": pred[j],
+            "attention": attn_layers[j].tolist(),  # 记录最后一层注意力权重
+        }
     predictions, labels = [], []
     val_loss, val_acc, val_step = 0.0, 0.0, 0
     bad_case, good_case = [],[]  # 记录bad case的列表
@@ -120,27 +132,11 @@ def evaluate(model, data_loader, show_attn=False):
             for j in range(len(label)):
                 if label[j] != pred[j]:
                     # print("bad case!")
-                    tokens, aspects, deps = data_loader.id2tags(batch[0][j], batch[1][j], batch[4][j])
-                    bad_case.append({
-                        "tokens": tokens,
-                        "aspects": aspects,
-                        "deps": deps,
-                        "label": label[j],
-                        "prediction": pred[j],
-                        "attention": attn_layers[j].tolist(),  # 记录最后一层注意力权重
-                    })
+                    bad_case.append(get_case(batch, j))
                 else:
                     # add good case
                     if j%10==0:
-                        tokens, aspects, deps = data_loader.id2tags(batch[0][j], batch[1][j], batch[4][j])
-                        bad_case.append({
-                            "tokens": tokens,
-                            "aspects": aspects,
-                            "deps": deps,
-                            "label": label[j],
-                            "prediction": pred[j],
-                            "attention": attn_layers[j].tolist(),  # 记录最后一层注意力权重
-                        })
+                        good_case.append(get_case(batch, j))
 
 
     # f1 score
