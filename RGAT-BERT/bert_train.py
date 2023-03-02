@@ -104,18 +104,20 @@ helper.ensure_dir(model_save_dir, verbose=True)
 
 def evaluate(model, data_loader):
     predictions, labels = [], []
+    attn=[]
     val_loss, val_acc, val_step = 0.0, 0.0, 0
     for i, batch in enumerate(data_loader):
-        loss, acc, pred, label, _, _ = model.predict(batch)
+        loss, acc, pred, label, _, _, attn_layers = model.predict(batch)
         val_loss += loss
         val_acc += acc
         predictions += pred
         labels += label
+        attn += attn_layers
         val_step += 1
         # print(val_loss,val_acc,predictions,labels)
     # f1 score
     f1_score = metrics.f1_score(labels, predictions, average="macro")
-    return val_loss / val_step, val_acc / val_step, f1_score
+    return val_loss / val_step, val_acc / val_step, f1_score, attn
 
 
 def _totally_parameters(model):  #
@@ -163,7 +165,7 @@ for epoch in range(1, args.num_epoch + 1):
             epoch, train_loss / train_step, train_acc / train_step, val_loss, val_acc, val_f1
         )
     )
-    print("attn:{}".format(attn))
+    print("attn.shape:{}, attn:{}".format(attn.shape, attn))
 
     train_acc_history.append(train_acc / train_step)
     train_loss_history.append(train_loss / train_step)
