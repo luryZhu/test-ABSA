@@ -126,7 +126,7 @@ def evaluate(model, data_loader, show_attn=False):
                         "deps": deps,
                         "label": label[j],
                         "prediction": pred[j],
-                        "attention": attn_layers[j].to_list()  # 记录最后一层注意力权重
+                        "attention": attn_layers[j].tolist()  # 记录最后一层注意力权重
                     })
                 else:
                     # add good case
@@ -137,7 +137,7 @@ def evaluate(model, data_loader, show_attn=False):
                             "deps": deps,
                             "label": label[j],
                             "prediction": pred[j],
-                            "attention": attn_layers[j].to_list()  # 记录最后一层注意力权重
+                            "attention": attn_layers[j].tolist()  # 记录最后一层注意力权重
                         })
 
 
