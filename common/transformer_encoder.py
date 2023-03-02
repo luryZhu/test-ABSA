@@ -37,7 +37,7 @@ class TransformerEncoderLayer(nn.Module):
             mask=mask,
             key_padding_mask=key_padding_mask,
             structure=structure,
-        )
+        ) # 多头注意力
         out = self.dropout(context) + inputs
         return self.feed_forward(out)
 

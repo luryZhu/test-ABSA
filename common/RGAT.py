@@ -34,16 +34,16 @@ class RGATLayer(nn.Module):
     """
 
         input_norm = self.layer_norm(inputs)
-        context, _ = self.self_attn(
+        context, top_attn = self.self_attn(
             input_norm,
             input_norm,
             input_norm,
             mask=mask,
             key_padding_mask=key_padding_mask,
             structure=structure,
-        )
+        ) # 第二个返回参数就是attention
         out = self.dropout(context) + inputs
-        return self.feed_forward(out)
+        return self.feed_forward(out), top_attn
 
 
 class RGATEncoder(nn.Module):
@@ -64,7 +64,7 @@ class RGATEncoder(nn.Module):
         super(RGATEncoder, self).__init__()
 
         self.num_layers = num_layers
-        self.transformer = nn.ModuleList(
+        self.transformer = nn.ModuleList( # RGATLayer的第二个返回值是多头注意力分数的concat
             [
                 RGATLayer(
                     d_model,
@@ -104,12 +104,15 @@ class RGATEncoder(nn.Module):
         # self._check_args(src, lengths)
 
         out = src  # [B, seq_len, H]
+        attn_layers = []
 
         # Run the forward pass of every layer of the tranformer.
-        for i in range(self.num_layers):
-            out = self.transformer[i](out, mask, src_key_padding_mask, structure=structure)
+        for i in range(self.num_layers): # transformer的第二个返回值更新为top_attention
+            out, attn = self.transformer[i](out, mask, src_key_padding_mask, structure=structure)
+            attn_layers[i] = attn
         out = self.layer_norm(out)  # [B, seq, H]
-        return out
+        # 第二个返回值是每一层的注意力分数
+        return out, attn_layers
 
 
 def sequence_mask(lengths, max_len=None):

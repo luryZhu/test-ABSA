@@ -205,7 +205,7 @@ class MultiHeadedAttention(nn.Module):
             mask = mask.unsqueeze(1)  # `[B, 1, seq_len, seq_len]`
             scores = scores.masked_fill(mask, -1e18)
 
-        # 3) Apply attention dropout and compute context vectors.
+        # 3) Apply attention dropout and compute context vectors.注意力
         attn = self.softmax(scores)
         drop_attn = self.dropout(attn)
         context = torch.matmul(drop_attn, value)

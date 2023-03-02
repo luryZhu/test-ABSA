@@ -23,9 +23,11 @@ class RGATABSA(nn.Module):
         self.enc = ABSAEncoder(args)
         self.classifier = nn.Linear(in_dim, args.num_class)
         self.dropout = nn.Dropout(0.1)
+        # self.attn_layers = None
 
     def forward(self, inputs):
-        outputs = self.enc(inputs)
+        outputs, attn_layers = self.enc(inputs)
+        # self.attn_layers = attn_layers
         outputs = self.dropout(outputs)
         logits = self.classifier(outputs)
         try:
@@ -38,7 +40,7 @@ class RGATABSA(nn.Module):
             # logits = torch.where(torch.isnan(logits), torch.full_like(logits, 0), logits)
             # logits = torch.nan_to_num(logits, nan=1e-8)
             print("alter nan to 0", logits)
-        return logits, outputs
+        return logits, outputs, attn_layers
 
 
 class ABSAEncoder(nn.Module):
@@ -57,6 +59,7 @@ class ABSAEncoder(nn.Module):
             embs = (self.pos_emb, self.post_emb)
             self.encoder = DoubleEncoder(args, embeddings=embs, use_dep=True)
         elif self.args.model.lower() == "rgat":
+            # RGAT 设置，使用DoubleEncoder作为encoder
             self.dep_emb = (
                 nn.Embedding(args.dep_size, args.dep_dim, padding_idx=0)
                 if args.dep_dim > 0
@@ -126,7 +129,7 @@ class ABSAEncoder(nn.Module):
         elif self.args.model.lower() == "rgat":
             h = self.encoder(
                 adj=adj, relation_matrix=label_all, inputs=inputs, lengths=l
-            )
+            ) # RGAT 输入邻接矩阵、关系矩阵
         else:
             print(
                 "Invalid model name {}, it should be (std, GAT, RGAT)".format(
@@ -135,7 +138,8 @@ class ABSAEncoder(nn.Module):
             )
             exit(0)
 
-        graph_out, bert_pool_output, bert_out = h[0], h[1], h[2]
+        # 使用RGAT模型时，第四个输出是attn_layers
+        graph_out, bert_pool_output, bert_out, attn_layers = h[0], h[1], h[2], h[3]
         asp_wn = mask.sum(dim=1).unsqueeze(-1)                          # aspect words num
         mask = mask.unsqueeze(-1).repeat(1, 1, self.args.bert_out_dim)  # mask for h
         graph_enc_outputs = (graph_out * mask).sum(dim=1) / asp_wn        # mask h
@@ -150,7 +154,7 @@ class ABSAEncoder(nn.Module):
             print('Invalid output_merge type !!!')
             exit()
         cat_outputs = torch.cat([merged_outputs, bert_pool_output], 1)
-        return cat_outputs
+        return cat_outputs, attn_layers
 
 
 class DoubleEncoder(nn.Module):
@@ -222,15 +226,16 @@ class DoubleEncoder(nn.Module):
             key_padding_mask = sequence_mask(lengths)  # [B, seq_len]
         
         if relation_matrix is not None:
-            dep_relation_embs = self.dep_emb(relation_matrix)
+            dep_relation_embs = self.dep_emb(relation_matrix) # 关系矩阵非空，则向量化
         else:
             dep_relation_embs = None
 
         inp = bert_out  # [bsz, seq_len, H]
-        graph_out = self.Graph_encoder(
+        # Graph_encoder就是ABSAEncoder，第二个参数是注意力，这里输出了每一层的注意力，越大越深
+        graph_out, attn_layers = self.Graph_encoder(
             inp, mask=mask, src_key_padding_mask=key_padding_mask, structure=dep_relation_embs
-        )               # [bsz, seq_len, H]
-        return graph_out, bert_pool_output, bert_out
+        )               # [bsz, seq_len, H] 直接调用Graph_encoder学习图像表征
+        return graph_out, bert_pool_output, bert_out, attn_layers
 
 
 def sequence_mask(lengths, max_len=None):

@@ -12,7 +12,7 @@ class ABSATrainer(object):
     def __init__(self, args, emb_matrix=None):
         self.args = args
         self.emb_matrix = emb_matrix
-        self.model = RGATABSA(args)
+        self.model = RGATABSA(args) # RGATEncoder，由多个RGATLayer组成
         self.parameters = [p for p in self.model.parameters() if p.requires_grad]
         self.model.cuda()
         self.optimizer = torch_utils.get_optimizer(args.optim, self.parameters, args.lr, l2=1e-5)
@@ -70,7 +70,8 @@ class ABSATrainer(object):
         # step forward
         self.model.train()
         self.optimizer.zero_grad()
-        logits, _ = self.model(inputs)
+        # sencond return is output，第三个输出是每一层的注意力分数
+        logits, _, attn_layers = self.model(inputs)
         # loss = F.cross_entropy(logits+1e-8, label, reduction="mean")
         loss = F.cross_entropy(logits, label, reduction="mean")
         # try:
@@ -98,7 +99,7 @@ class ABSATrainer(object):
 
         # forward
         self.model.eval()
-        logits, g_outputs = self.model(inputs)
+        logits, g_outputs, attn_layers = self.model(inputs)
         loss = F.cross_entropy(logits, label, reduction="mean")
         corrects = (torch.max(logits, 1)[1].view(label.size()).data == label.data).sum()
         acc = 100.0 * np.float(corrects) / label.size()[0]

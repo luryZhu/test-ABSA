@@ -49,17 +49,19 @@ test_batch = ABSADataLoader(
 
 def evaluate(model, data_loader):
     predictions, labels = [], []
+    attn = []
     val_loss, val_acc, val_step = 0.0, 0.0, 0
     for i, batch in enumerate(data_loader):
-        loss, acc, pred, label, _, _ = model.predict(batch)
+        loss, acc, pred, label, _, _, attn_layers = model.predict(batch)
         val_loss += loss
         val_acc += acc
         predictions += pred
         labels += label
+        attn += attn_layers
         val_step += 1
     # f1 score
     f1_score = metrics.f1_score(labels, predictions, average="macro")
-    return val_loss / val_step, val_acc / val_step, f1_score
+    return val_loss / val_step, val_acc / val_step, f1_score, attn
 
 
 def _totally_parameters(model):  #
@@ -75,5 +77,6 @@ print("Loading best checkpoint from ", best_path)
 trainer = torch.load(best_path)
 print(trainer.model)
 print('# parameters:', _totally_parameters(trainer.model))
-test_loss, test_acc, test_f1 = evaluate(trainer, test_batch)
+test_loss, test_acc, test_f1, attn = evaluate(trainer, test_batch)
 print("Evaluation Results: test_loss:{}, test_acc:{}, test_f1:{}".format(test_loss, test_acc, test_f1))
+print("attn.shape:{}\nattn:{}".format(attn),attn)
