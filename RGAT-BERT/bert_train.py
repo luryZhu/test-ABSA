@@ -108,9 +108,20 @@ helper.ensure_dir(model_save_dir, verbose=True)
 def evaluate(model, data_loader, show_attn=False):
     def get_case(batch, j):
         tokens, aspects, deps = data_loader.id2tags(batch[0][j], batch[1][j], batch[4][j])
+        mask = batch[6][j]
+        for i in range(len(mask)):
+            if mask[i] == 1:
+                from_idx = i
+                break
+
+        for i in range(len(mask) - 1, -1, -1):
+            if mask[i] == 1:
+                to_idx = i
+                break
         return {
             "tokens": tokens,
             "aspects": aspects,
+            "from_to": [from_idx, to_idx],
             "deps": deps,
             "label": label[j],
             "prediction": pred[j],
