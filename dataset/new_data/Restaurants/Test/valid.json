@@ -1,0 +1,118 @@
+[
+    {
+        "token": [
+            "Food",
+            "is",
+            "always",
+            "fresh",
+            "and",
+            "hot-",
+            "ready",
+            "to",
+            "eat",
+            "!"
+        ],
+        "pos": [
+            "NOUN",
+            "AUX",
+            "ADV",
+            "ADJ",
+            "CCONJ",
+            "ADV",
+            "ADJ",
+            "PART",
+            "VERB",
+            "PUNCT"
+        ],
+        "deprel": [
+            "root",
+            "2_hop",
+            "2_hop",
+            "nsubj",
+            "3_hop",
+            "3_hop",
+            "2_hop",
+            "4_hop",
+            "3_hop",
+            "<pad>"
+        ],
+        "head": [
+            4,
+            4,
+            4,
+            0,
+            7,
+            7,
+            4,
+            9,
+            7,
+            4
+        ],
+        "aspects": [
+            {
+                "term": [
+                    "Food"
+                ],
+                "from": 0,
+                "to": 1,
+                "polarity": "positive"
+            }
+        ]
+    },
+    {
+        "token": [
+            "Did",
+            "I",
+            "mention",
+            "that",
+            "the",
+            "coffee",
+            "is",
+            "OUTSTANDING",
+            "?"
+        ],
+        "pos": [
+            "AUX",
+            "PRON",
+            "VERB",
+            "SCONJ",
+            "DET",
+            "NOUN",
+            "AUX",
+            "ADJ",
+            "PUNCT"
+        ],
+        "deprel": [
+            "3_hop",
+            "3_hop",
+            "2_hop",
+            "2_hop",
+            "det",
+            "root",
+            "2_hop",
+            "nsubj",
+            "<pad>"
+        ],
+        "head": [
+            3,
+            3,
+            0,
+            8,
+            6,
+            8,
+            8,
+            3,
+            3
+        ],
+        "aspects": [
+            {
+                "term": [
+                    "coffee"
+                ],
+                "from": 5,
+                "to": 6,
+                "polarity": "positive"
+            }
+        ]
+    }
+]

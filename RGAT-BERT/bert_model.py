@@ -24,8 +24,8 @@ class RGATABSA(nn.Module):
         self.classifier = nn.Linear(in_dim, args.num_class)
         self.dropout = nn.Dropout(0.1)
 
-    def forward(self, inputs):
-        outputs = self.enc(inputs)
+    def forward(self, inputs, show_attn=False):
+        outputs, attn_layers = self.enc(inputs, show_attn=show_attn)
         outputs = self.dropout(outputs)
         logits = self.classifier(outputs)
         try:
@@ -38,7 +38,7 @@ class RGATABSA(nn.Module):
             # logits = torch.where(torch.isnan(logits), torch.full_like(logits, 0), logits)
             # logits = torch.nan_to_num(logits, nan=1e-8)
             print("alter nan to 0", logits)
-        return logits, outputs
+        return logits, outputs, attn_layers
 
 
 class ABSAEncoder(nn.Module):
@@ -73,7 +73,7 @@ class ABSAEncoder(nn.Module):
             print('Invalid output_merge type !!!')
             exit()
 
-    def forward(self, inputs):
+    def forward(self, inputs, show_attn=False):
         (
             tok,
             asp,
@@ -123,9 +123,9 @@ class ABSAEncoder(nn.Module):
             h = self.encoder(adj=None, inputs=inputs, lengths=l)
         elif self.args.model.lower() == "gat":
             h = self.encoder(adj=adj, inputs=inputs, lengths=l)
-        elif self.args.model.lower() == "rgat":
+        elif self.args.model.lower() == "rgat": # add attention
             h = self.encoder(
-                adj=adj, relation_matrix=label_all, inputs=inputs, lengths=l
+                adj=adj, relation_matrix=label_all, inputs=inputs, lengths=l, show_attn=show_attn
             )
         else:
             print(
@@ -135,7 +135,7 @@ class ABSAEncoder(nn.Module):
             )
             exit(0)
 
-        graph_out, bert_pool_output, bert_out = h[0], h[1], h[2]
+        graph_out, bert_pool_output, bert_out, attn_layers = h[0], h[1], h[2], h[3]
         asp_wn = mask.sum(dim=1).unsqueeze(-1)                          # aspect words num
         mask = mask.unsqueeze(-1).repeat(1, 1, self.args.bert_out_dim)  # mask for h
         graph_enc_outputs = (graph_out * mask).sum(dim=1) / asp_wn        # mask h
@@ -150,7 +150,7 @@ class ABSAEncoder(nn.Module):
             print('Invalid output_merge type !!!')
             exit()
         cat_outputs = torch.cat([merged_outputs, bert_pool_output], 1)
-        return cat_outputs
+        return cat_outputs, attn_layers
 
 
 class DoubleEncoder(nn.Module):
@@ -189,7 +189,7 @@ class DoubleEncoder(nn.Module):
         if isinstance(m, nn.Linear):
             nn.init.xavier_normal_(m.weight)
 
-    def forward(self, adj, inputs, lengths, relation_matrix=None):
+    def forward(self, adj, inputs, lengths, relation_matrix=None, show_attn=False):
         (
             tok,
             asp,
@@ -227,10 +227,11 @@ class DoubleEncoder(nn.Module):
             dep_relation_embs = None
 
         inp = bert_out  # [bsz, seq_len, H]
-        graph_out = self.Graph_encoder(
-            inp, mask=mask, src_key_padding_mask=key_padding_mask, structure=dep_relation_embs
+        # Graph_encoder is RGATEncoder
+        graph_out, attn_layers = self.Graph_encoder(
+            inp, mask=mask, src_key_padding_mask=key_padding_mask, structure=dep_relation_embs, show_attn=show_attn
         )               # [bsz, seq_len, H]
-        return graph_out, bert_pool_output, bert_out
+        return graph_out, bert_pool_output, bert_out, attn_layers
 
 
 def sequence_mask(lengths, max_len=None):

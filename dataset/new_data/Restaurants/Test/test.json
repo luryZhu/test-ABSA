@@ -1,0 +1,139 @@
+[
+    {
+        "token": [
+            "The",
+            "bread",
+            "is",
+            "top",
+            "notch",
+            "as",
+            "well",
+            "."
+        ],
+        "pos": [
+            "DET",
+            "NOUN",
+            "AUX",
+            "ADJ",
+            "NOUN",
+            "ADV",
+            "ADV",
+            "PUNCT"
+        ],
+        "deprel": [
+            "det",
+            "root",
+            "2_hop",
+            "2_hop",
+            "nsubj",
+            "2_hop",
+            "3_hop",
+            "<pad>"
+        ],
+        "head": [
+            2,
+            5,
+            5,
+            5,
+            0,
+            5,
+            6,
+            5
+        ],
+        "aspects": [
+            {
+                "term": [
+                    "bread"
+                ],
+                "from": 1,
+                "to": 2,
+                "polarity": "positive"
+            }
+        ]
+    },
+    {
+        "token": [
+            "I",
+            "have",
+            "to",
+            "say",
+            "they",
+            "have",
+            "one",
+            "of",
+            "the",
+            "fastest",
+            "delivery",
+            "times",
+            "in",
+            "the",
+            "city",
+            "."
+        ],
+        "pos": [
+            "PRON",
+            "VERB",
+            "PART",
+            "VERB",
+            "PRON",
+            "VERB",
+            "NUM",
+            "ADP",
+            "DET",
+            "ADJ",
+            "NOUN",
+            "NOUN",
+            "ADP",
+            "DET",
+            "NOUN",
+            "PUNCT"
+        ],
+        "deprel": [
+            "3_hop",
+            "2_hop",
+            "4_hop",
+            "3_hop",
+            "3_hop",
+            "2_hop",
+            "nmod",
+            "pobj",
+            "det",
+            "amod",
+            "root",
+            "<pad>",
+            "2_hop",
+            "2_hop",
+            "nmod",
+            "<pad>"
+        ],
+        "head": [
+            2,
+            0,
+            4,
+            2,
+            6,
+            4,
+            6,
+            12,
+            12,
+            12,
+            12,
+            7,
+            15,
+            15,
+            12,
+            2
+        ],
+        "aspects": [
+            {
+                "term": [
+                    "delivery",
+                    "times"
+                ],
+                "from": 10,
+                "to": 12,
+                "polarity": "positive"
+            }
+        ]
+    }
+]

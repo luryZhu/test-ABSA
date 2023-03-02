@@ -8,7 +8,7 @@ exp_setting=train
 exp_dataset=new_data/Restaurants/$exp_parser
 
 ############# Restaurants acc:86.68 f1:80.92 #################
-
+# saved_models/Restaurants/Test
 exp_path=$save_dir/Restaurants/$exp_setting
 if [ ! -d "$exp_path" ]; then
   mkdir -p "$exp_path"
