@@ -102,8 +102,8 @@ def evaluate(model, data_loader, show_attn=False):
                     print("bad case!")
                     tokens, deps = data_loader.id2tags(batch[0][j], batch[4][j])
                     bad_case.append({
-                        "tokens": tokens.to_list(),
-                        "deps": deps.to_list(),
+                        "tokens": tokens,
+                        "deps": deps,
                         "label": label[j],
                         "prediction": pred[j],
                         "attention": attn_layers[j].to_list()  # 记录最后一层注意力权重
