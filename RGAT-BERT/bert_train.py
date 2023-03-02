@@ -156,13 +156,14 @@ for epoch in range(1, args.num_epoch + 1):
                 )
             )
 
-    val_loss, val_acc, val_f1 = evaluate(trainer, valid_batch)
+    val_loss, val_acc, val_f1, attn = evaluate(trainer, valid_batch)
 
     print(
         "End of {} train_loss: {:.4f}, train_acc: {:.4f}, val_loss: {:.4f}, val_acc: {:.4f}, f1_score: {:.4f}".format(
             epoch, train_loss / train_step, train_acc / train_step, val_loss, val_acc, val_f1
         )
     )
+    print("attn:{}".format(attn))
 
     train_acc_history.append(train_acc / train_step)
     train_loss_history.append(train_loss / train_step)
