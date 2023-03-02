@@ -113,5 +113,5 @@ class ABSATrainer(object):
             label.data.cpu().numpy().tolist(),
             predprob,
             g_outputs.data.cpu().numpy(),
-            attn_layers.data.cpu().numpy()
+            attn_layers
         )
