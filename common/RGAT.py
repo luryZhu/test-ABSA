@@ -104,15 +104,15 @@ class RGATEncoder(nn.Module):
         # self._check_args(src, lengths)
 
         out = src  # [B, seq_len, H]
-        attn_layers = []
+        # attn_layers = []
 
         # Run the forward pass of every layer of the tranformer.
         for i in range(self.num_layers): # transformer的第二个返回值更新为top_attention
             out, attn = self.transformer[i](out, mask, src_key_padding_mask, structure=structure)
-            attn_layers += attn
+            # attn_layers += attn
         out = self.layer_norm(out)  # [B, seq, H]
         # 第二个返回值是每一层的注意力分数
-        return out, attn_layers
+        return out, attn
 
 
 def sequence_mask(lengths, max_len=None):
