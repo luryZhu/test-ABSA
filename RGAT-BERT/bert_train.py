@@ -214,8 +214,10 @@ print("Loading best checkpoint from ", best_path)
 trainer = torch.load(best_path)
 test_loss, test_acc, test_f1, bad_case, good_case = evaluate(trainer, test_batch, show_attn=True)
 print("Evaluation Results: test_loss:{}, test_acc:{}, test_f1:{}".format(test_loss, test_acc, test_f1))
-print("bad case:", bad_case[0])
-print("good case:", good_case[0])
+if len(bad_case)>0:
+    print("bad case:", bad_case[0])
+if len(good_case) > 0:
+    print("good case:", good_case[0])
 with open(model_save_dir + '/good_case.json', 'w') as file:
     json.dump(good_case, file)
 with open(model_save_dir + '/bad_case.json', 'w') as file:
