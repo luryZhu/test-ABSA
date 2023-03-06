@@ -106,7 +106,7 @@ helper.ensure_dir(model_save_dir, verbose=True)
 
 
 def evaluate(model, data_loader, show_attn=False):
-    def get_case(batch, j):
+    def get_case(batch, j, id):
         tokens, aspects, deps = data_loader.id2tags(batch[0][j], batch[1][j], batch[4][j])
         mask = batch[6][j]
         for i in range(len(mask)):
@@ -116,9 +116,10 @@ def evaluate(model, data_loader, show_attn=False):
 
         for i in range(len(mask) - 1, -1, -1):
             if mask[i] == 1:
-                to_idx = i
+                to_idx = i+1
                 break
         return {
+            "id": id,
             "tokens": tokens,
             "aspects": aspects,
             "from_to": [from_idx, to_idx],
@@ -141,13 +142,14 @@ def evaluate(model, data_loader, show_attn=False):
         if show_attn:
             # bad case
             for j in range(len(label)):
+                id = i * args.batch_size + j
                 if label[j] != pred[j]:
                     # print("bad case!")
-                    bad_case.append(get_case(batch, j))
+                    bad_case.append(get_case(batch, j, id))
                 else:
                     # add good case
-                    if j%10==0:
-                        good_case.append(get_case(batch, j))
+                    if j%16==0:
+                        good_case.append(get_case(batch, j, id))
 
 
     # f1 score
@@ -223,12 +225,12 @@ print("Loading best checkpoint from ", best_path)
 trainer = torch.load(best_path)
 test_loss, test_acc, test_f1, bad_case, good_case = evaluate(trainer, test_batch, show_attn=True)
 print("Evaluation Results: test_loss:{}, test_acc:{}, test_f1:{}".format(test_loss, test_acc, test_f1))
-if len(bad_case)>0:
-    print("bad case:", bad_case[0])
-if len(good_case) > 0:
-    print("good case:", good_case[0])
+# if len(bad_case)>0:
+#     print("bad case:", bad_case[0])
+# if len(good_case) > 0:
+#     print("good case:", good_case[0])
 with open(model_save_dir + '/good_case.json', 'w') as file:
     json.dump(good_case, file)
 with open(model_save_dir + '/bad_case.json', 'w') as file:
-    json.dump(good_case, file)
+    json.dump(bad_case, file)
 print("done write cases to", model_save_dir)
