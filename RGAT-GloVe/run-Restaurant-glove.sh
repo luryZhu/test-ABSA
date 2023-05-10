@@ -1,7 +1,7 @@
 #!/bin/bash
 # training command for different datasets.
 source_dir=../dataset
-emb_dir=/mnt/data2/xfbai/data/embeddings/glove
+emb_dir=../../
 save_dir=saved_models
 
 exp_setting=train

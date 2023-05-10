@@ -95,7 +95,7 @@ class ABSAEncoder(nn.Module):
         torch.nn.init.zeros_(self.inp_map.bias)
 
     def forward(self, inputs, show_attn=False):
-        tok, asp, pos, head, deprel, post, mask_ori, lengths = inputs  # unpack inputs
+        tok, asp, pos, head, deprel, post, mask_ori, lengths, dist = inputs  # unpack inputs
         maxlen = max(lengths.data)
 
         """
@@ -187,7 +187,7 @@ class ABSAEncoder(nn.Module):
         #     graph_out = torch.matmul(masked_attns.unsqueeze(1), graph_out).squeeze(1)
 
         if self.args.output_merge.lower() == "none":
-            return graph_out
+            return graph_out, attn_layers
 
         sent_out = self.inp_map(sent_out)      # avg pooling
         if self.args.pooling.lower() == "avg":
@@ -293,7 +293,7 @@ class DoubleEncoder(nn.Module):
         return rnn_outputs
 
     def forward(self, adj, inputs, lengths, relation_matrix=None, show_attn=False):
-        tok, asp, pos, head, deprel, post, a_mask, seq_len = inputs  # unpack inputs
+        tok, asp, pos, head, deprel, post, a_mask, seq_len, dist = inputs  # unpack inputs
         # embedding
         word_embs = self.emb(tok)
         embs = [word_embs]
@@ -301,6 +301,9 @@ class DoubleEncoder(nn.Module):
             embs += [self.pos_emb(pos)]
         if self.args.post_dim > 0:
             embs += [self.post_emb(post)]
+        #     depemb
+        # if self.args.dep_dim > 0:
+        #     embs += [self.dep_emb(deprel)]
         embs = torch.cat(embs, dim=2)
         embs = self.in_drop(embs)
 
@@ -316,7 +319,7 @@ class DoubleEncoder(nn.Module):
         # Graph encoding 
         inp = sent_output
         graph_output, attn_layers = self.graph_encoder(
-            inp, mask=mask, src_key_padding_mask=key_padding_mask, structure=dep_relation_embs, show_attn=show_attn
+            inp, mask=mask, src_key_padding_mask=key_padding_mask, structure=dep_relation_embs, show_attn=show_attn, weight=dist
         )  # [bsz, seq_len, H]
         graph_output = self.out_map(graph_output)
         return sent_output, graph_output, attn_layers

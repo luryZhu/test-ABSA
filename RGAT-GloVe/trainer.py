@@ -43,7 +43,7 @@ class ABSATrainer(object):
         batch = [b.cuda() for b in batch]
 
         # unpack inputs and label
-        inputs = batch[0:8]
+        inputs = batch[0:9]
         label = batch[-1]
 
         # step forward
@@ -64,7 +64,7 @@ class ABSATrainer(object):
         batch = [b.cuda() for b in batch]
 
         # unpack inputs and label
-        inputs = batch[0:8]
+        inputs = batch[0:9]
         label = batch[-1]
 
         # forward
@@ -83,7 +83,7 @@ class ABSATrainer(object):
         batch = [b.cuda() for b in batch]
 
         # unpack inputs and label
-        inputs = batch[0:8]
+        inputs = batch[0:9]
         label = batch[-1]
 
         # forward

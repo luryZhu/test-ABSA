@@ -28,6 +28,7 @@ class ABSADataLoader(object):
         self.batch_size = batch_size
         self.args = args
         self.vocab = vocab
+        self.max_hop = 6
 
         with open(filename) as infile:
             data = json.load(infile)
@@ -80,12 +81,17 @@ class ABSADataLoader(object):
         return tokens, aspects, deps
 
     def get_distance_weight(self, dist):
-        return 1 - (dist-1) / 6
+        if dist > self.max_hop:
+            return 0
+        return 1 - (dist-1) / self.max_hop
+
+    # def get_deprel(self):
 
     def preprocess(self, data, vocab, args):
         # unpack vocab
         token_vocab, post_vocab, pos_vocab, dep_vocab, pol_vocab = vocab
         processed = []
+        bad_dep = ["det"]
 
         for d in data:
             for aspect in d["aspects"]:
@@ -143,7 +149,18 @@ class ABSADataLoader(object):
                 head = [int(x) for x in head]
                 assert any([x == 0 for x in head])
                 # mapping deprel
-                deprel = [dep_vocab.stoi.get(t, dep_vocab.unk_index) for t in deprel]
+                temp=[]
+                for i,t in enumerate(deprel):
+                    if deprel in bad_dep:
+                        temp.append(0)
+                        print("bad!")
+                    elif dist[i] > self.max_hop:
+                        temp.append(0)
+                    else:
+                        temp.append(dep_vocab.stoi.get(t, dep_vocab.unk_index))
+                deprel=temp
+
+                # deprel = [dep_vocab.stoi.get(t, dep_vocab.unk_index) for t in deprel]
                 # mapping post
                 post = [post_vocab.stoi.get(t, post_vocab.unk_index) for t in post]
                 # get dist weight

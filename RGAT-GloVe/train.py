@@ -11,6 +11,8 @@ from sklearn import metrics
 from loader import ABSADataLoader
 from trainer import ABSATrainer
 from load_w2v import load_pretrained_embedding
+import json
+from thop import profile
 
 
 parser = argparse.ArgumentParser()
@@ -85,9 +87,32 @@ def get_dataloaders(args, vocab):
 
 
 def evaluate(model, data_loader, show_attn=False):
+    def get_case(batch, j, id):
+        tokens, aspects, deps = data_loader.id2tags(batch[0][j], batch[1][j], batch[4][j])
+        mask = batch[6][j]
+        for i in range(len(mask)):
+            if mask[i] == 1:
+                from_idx = i
+                break
+
+        for i in range(len(mask) - 1, -1, -1):
+            if mask[i] == 1:
+                to_idx = i+1
+                break
+        return {
+            "id": id,
+            "tokens": tokens,
+            "aspects": aspects,
+            "from_to": [from_idx, to_idx],
+            "deps": deps,
+            "label": label[j],
+            "prediction": pred[j],
+            "attention": attn_layers[j].tolist(),  # 记录最后一层注意力权重
+        }
     predictions, labels = [], []
     val_loss, val_acc, val_step = 0.0, 0.0, 0
     bad_case = []  # 记录bad case的列表
+    good_case = []
     for i, batch in enumerate(data_loader):
         loss, acc, pred, label, _, _, attn_layers = model.predict(batch, show_attn=show_attn)
         val_loss += loss
@@ -98,23 +123,20 @@ def evaluate(model, data_loader, show_attn=False):
         if show_attn:
             # bad case
             for j in range(len(label)):
+                id = i * args.batch_size + j
                 if label[j] != pred[j]:
-                    print("bad case!")
-                    tokens, aspects, deps = data_loader.id2tags(batch[0][j], batch[1][j], batch[4][j])
-                    bad_case.append({
-                        "tokens": tokens,
-                        "aspects": aspects,
-                        "deps": deps,
-                        "label": label[j],
-                        "prediction": pred[j],
-                        "attention": attn_layers[j].tolist(),  # 记录最后一层注意力权重
-                    })
+                    # print("bad case!")
+                    bad_case.append(get_case(batch, j, id))
+                else:
+                    # add good case
+                    if j % 16 == 0:
+                        good_case.append(get_case(batch, j, id))
 
     # f1 score
     f1_score = metrics.f1_score(labels, predictions, average="macro")
     print("total bad cases:{}".format(len(bad_case)))
 
-    return val_loss / val_step, val_acc / val_step, f1_score, bad_case
+    return val_loss / val_step, val_acc / val_step, f1_score, bad_case, good_case
 
 
 def _totally_parameters(model):  #
@@ -140,7 +162,9 @@ def trainmodel(config=None):
     train_batch, valid_batch, test_batch = get_dataloaders(args, vocab)
 
     trainer = ABSATrainer(args, emb_matrix=word_emb)
-    print(trainer.model)
+    flops, params = profile(trainer.model, inputs=(train_batch,))
+    print('FLOPS: ', flops)
+    # print(trainer.model)
     print("Total parameters:", _totally_parameters(trainer.model))
     
     best_path = args.save_dir
@@ -170,7 +194,7 @@ def trainmodel(config=None):
                         i, len(train_batch), train_loss / train_step, train_acc / train_step
                     )
                 )
-        val_loss, val_acc, val_f1, _ = evaluate(trainer, valid_batch)
+        val_loss, val_acc, val_f1, _, _ = evaluate(trainer, valid_batch)
     
         print(
             "End of {} train_loss: {:.4f}, train_acc: {:.4f}, val_loss: {:.4f}, val_acc: {:.4f}, f1_score: {:.4f}".format(
@@ -214,9 +238,13 @@ def trainmodel(config=None):
     # )
     print("Loading best checkpoints from", best_path + '/best_checkpoint.pt')
     trainer = torch.load(best_path + '/best_checkpoint.pt')
-    test_loss, test_acc, test_f1, bad_case = evaluate(trainer, test_batch, show_attn=True)
+    test_loss, test_acc, test_f1, bad_case, good_case = evaluate(trainer, test_batch, show_attn=True)
     print("Evaluation Results: test_loss:{}, test_acc:{}, test_f1:{}".format(test_loss, test_acc, test_f1))
-
+    with open(best_path + '/good_case.json', 'w') as file:
+        json.dump(good_case, file)
+    with open(best_path + '/bad_case.json', 'w') as file:
+        json.dump(bad_case, file)
+    print("done write cases to", best_path)
 
 # load vocab
 print("Loading vocab...")

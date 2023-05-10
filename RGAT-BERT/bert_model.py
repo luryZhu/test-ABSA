@@ -8,6 +8,7 @@ from common.tree import head_to_adj
 from common.transformer_encoder import TransformerEncoder
 from common.RGAT import RGATEncoder
 from transformers import BertModel, BertConfig
+from torch.autograd import Variable
 
 bert_config = BertConfig.from_pretrained("bert-base-uncased")
 bert_config.output_hidden_states = True
@@ -153,6 +154,11 @@ class ABSAEncoder(nn.Module):
         cat_outputs = torch.cat([merged_outputs, bert_pool_output], 1)
         return cat_outputs, attn_layers
 
+def rnn_zero_state(batch_size, hidden_dim, num_layers, bidirectional=True):
+    total_layers = num_layers * 2 if bidirectional else num_layers
+    state_shape = (total_layers, batch_size, hidden_dim)
+    h0 = c0 = Variable(torch.zeros(*state_shape), requires_grad=False)
+    return h0.cuda(), c0.cuda()
 
 class DoubleEncoder(nn.Module):
     def __init__(self, args, embeddings=None, use_dep=False):
@@ -187,9 +193,48 @@ class DoubleEncoder(nn.Module):
         if args.reset_pooling:
             self.reset_params(bert.pooler.dense)
 
+        self.use_lstm = args.use_lstm
+        if args.use_lstm:
+            self.in_dim = args.bert_out_dim + args.post_dim + args.pos_dim
+            input_size = self.in_dim
+            self.LSTM_encoder = nn.LSTM(
+                input_size,
+                args.rnn_hidden,
+                args.rnn_layers,
+                batch_first=True,
+                dropout=args.rnn_dropout,
+                bidirectional=True,
+            )
+            # if args.bidirect:
+            self.in_dim = args.rnn_hidden * 2
+            # dropout
+            self.rnn_drop = nn.Dropout(args.rnn_dropout)
+
+            self.Graph_encoder = RGATEncoder(
+                num_layers=args.num_layer,
+                d_model=args.rnn_hidden,
+                heads=4,
+                d_ff=args.hidden_dim,
+                dep_dim=self.args.dep_dim,
+                att_drop=self.args.att_dropout,
+                dropout=0.0,
+                use_structure=True
+            )
+            self.dense_LSTM = nn.Linear(args.rnn_hidden*2, args.rnn_hidden)
+
+
     def reset_params(self, m):
         if isinstance(m, nn.Linear):
             nn.init.xavier_normal_(m.weight)
+
+    def encode_with_rnn(self, rnn_inputs, seq_lens, batch_size):
+        h0, c0 = rnn_zero_state(
+            batch_size, self.args.rnn_hidden, self.args.rnn_layers, True
+        )
+        rnn_inputs = nn.utils.rnn.pack_padded_sequence(rnn_inputs, seq_lens, batch_first=True)
+        rnn_outputs, (ht, ct) = self.LSTM_encoder(rnn_inputs, (h0, c0))
+        rnn_outputs, _ = nn.utils.rnn.pad_packed_sequence(rnn_outputs, batch_first=True)
+        return rnn_outputs
 
     def forward(self, adj, inputs, lengths, relation_matrix=None, show_attn=False):
         (
@@ -230,6 +275,28 @@ class DoubleEncoder(nn.Module):
             dep_relation_embs = None
 
         inp = bert_out  # [bsz, seq_len, H]
+
+        if self.use_lstm:
+            ##################################
+            # embedding
+            embs = [bert_out]
+            if self.args.pos_dim > 0:
+                embs += [self.pos_emb(pos)]
+            if self.args.post_dim > 0:
+                embs += [self.post_emb(post)]
+            embs = torch.cat(embs, dim=2)
+            embs = self.in_drop(embs)
+            ##################################
+
+            # Sentence encoding
+            sent_output = self.rnn_drop(
+                self.encode_with_rnn(embs, l.cpu(), tok.size()[0])
+            )  # [B, seq_len, H]
+            ##################################
+            sent_output = self.dense_LSTM(sent_output)
+            inp = sent_output
+            # print(inp.shape)
+
         # Graph_encoder is RGATEncoder
         if not self.use_dist:
             dist = None

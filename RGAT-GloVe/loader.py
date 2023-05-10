@@ -46,6 +46,9 @@ class ABSADataLoader(object):
         deps = [dep_vocab.itos[i] for i in deps]
         return tokens, aspects, deps
 
+    def get_distance_weight(self, dist):
+        return 1-dist/7
+
     def preprocess(self, data, vocab, args):
         # unpack vocab
         token_vocab, post_vocab, pos_vocab, dep_vocab, pol_vocab = vocab
@@ -68,6 +71,8 @@ class ABSADataLoader(object):
                 head = list(d["head"])
                 # deprel
                 deprel = list(d["deprel"])
+                # distance
+                dist = list(d["distance"])
                 # real length
                 length = len(tok)
                 # position
@@ -97,14 +102,19 @@ class ABSADataLoader(object):
                 # mapping pos
                 pos = [pos_vocab.stoi.get(t, pos_vocab.unk_index) for t in pos]
                 # mapping head to int
+                dist = [self.get_distance_weight(d) for d in dist]
+                # get dist weight
 
                 head = [int(x) for x in head]
 
                 assert any([x == 0 for x in head])
+                # distance maping
+                dist = [t for t in dist]
                 # mapping deprel
                 deprel = [dep_vocab.stoi.get(t, dep_vocab.unk_index) for t in deprel]
                 # mapping post
                 post = [post_vocab.stoi.get(t, post_vocab.unk_index) for t in post]
+
 
                 assert (
                     len(tok) == length
@@ -113,9 +123,10 @@ class ABSADataLoader(object):
                     and len(deprel) == length
                     and len(post) == length
                     and len(mask) == length
+                    and len(dist) == length
                 )
 
-                processed += [(tok, asp, pos, head, deprel, post, mask, length, label)]
+                processed += [(tok, asp, pos, head, deprel, post, mask, length, dist, label)]
 
         return processed
 
@@ -156,10 +167,12 @@ class ABSADataLoader(object):
         mask = get_float_tensor(batch[6], batch_size)
         # length
         length = torch.LongTensor(batch[7])
+        # dist
+        dist = get_float_tensor(batch[8], batch_size)
         # label
-        label = torch.LongTensor(batch[8])
+        label = torch.LongTensor(batch[9])
 
-        return (tok, asp, pos, head, deprel, post, mask, length, label)
+        return (tok, asp, pos, head, deprel, post, mask, length, dist, label)
 
     def __iter__(self):
         for i in range(self.__len__()):

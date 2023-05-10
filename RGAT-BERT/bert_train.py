@@ -12,6 +12,7 @@ from utils import helper
 from sklearn import metrics
 from bert_loader import ABSADataLoader
 from bert_trainer import ABSATrainer
+from thop import profile
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--data_dir", type=str, default="dataset/Restaurants")
@@ -19,8 +20,8 @@ parser.add_argument("--vocab_dir", type=str, default="dataset/Restaurants")
 parser.add_argument("--hidden_dim", type=int, default=768, help="bert dim.")
 
 parser.add_argument("--dep_dim", type=int, default=30, help="dep embedding dimension.")
-parser.add_argument("--pos_dim", type=int, default=0, help="pos embedding dimension.")
-parser.add_argument("--post_dim", type=int, default=0, help="position embedding dimension.")
+parser.add_argument("--pos_dim", type=int, default=30, help="pos embedding dimension.")
+parser.add_argument("--post_dim", type=int, default=30, help="position embedding dimension.")
 parser.add_argument("--num_class", type=int, default=3, help="Num of sentiment class.")
 
 parser.add_argument("--input_dropout", type=float, default=0.1, help="Input dropout rate.")
@@ -58,7 +59,14 @@ parser.add_argument(
     help="merge method to use, (none, addnorm, add, attn, gate, gatenorm2)",
 )
 parser.add_argument("--max_len", type=int, default=80)
-parser.add_argument("--use_dist", type=bool, default=False)
+parser.add_argument("--use_dist", default=False, action="store_true")
+
+# LSTM
+parser.add_argument("--use_lstm", default=False, action="store_true")
+parser.add_argument("--rnn_hidden", type=int, default=80, help="RNN hidden state size.")
+parser.add_argument("--rnn_layers", type=int, default=1, help="Number of RNN layers.")
+parser.add_argument("--rnn_dropout", type=float, default=0.1, help="RNN dropout rate.")
+
 
 args = parser.parse_args()
 
@@ -166,8 +174,13 @@ def _totally_parameters(model):  #
 
 # build model
 trainer = ABSATrainer(args)
+
+flops, params = profile(trainer.model, inputs=(train_batch,))
+print('FLOPS: ', flops)
 # print(trainer.model)
-print('# parameters:', _totally_parameters(trainer.model))
+print("Total parameters:", _totally_parameters(trainer.model))
+
+
 best_path = model_save_dir + "/best_model.pt"
 print("Training Set: {}".format(len(train_batch)))
 print("Valid/Test Set: {}".format(len(test_batch)))
