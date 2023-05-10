@@ -58,6 +58,7 @@ parser.add_argument(
     help="merge method to use, (none, addnorm, add, attn, gate, gatenorm2)",
 )
 parser.add_argument("--max_len", type=int, default=80)
+parser.add_argument("--use_dist", type=bool, default=False)
 
 args = parser.parse_args()
 

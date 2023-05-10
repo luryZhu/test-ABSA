@@ -21,7 +21,7 @@ class RGATLayer(nn.Module):
         self.layer_norm = nn.LayerNorm(d_model, eps=1e-6)
         self.dropout = nn.Dropout(dropout)
 
-    def forward(self, inputs, mask=None, key_padding_mask=None, structure=None):
+    def forward(self, inputs, mask=None, key_padding_mask=None, structure=None, weight=None):
         """
     Args:
        input (`FloatTensor`): set of `key_len`
@@ -42,6 +42,7 @@ class RGATLayer(nn.Module):
             mask=mask,
             key_padding_mask=key_padding_mask,
             structure=structure,
+            weight=weight
         )
         out = self.dropout(context) + inputs
         return self.feed_forward(out), top_attn
@@ -89,7 +90,7 @@ class RGATEncoder(nn.Module):
             (n_batch_,) = lengths.size()
             # aeq(n_batch, n_batch_)
 
-    def forward(self, src, src_key_padding_mask=None, mask=None, structure=None, show_attn=False):
+    def forward(self, src, src_key_padding_mask=None, mask=None, structure=None, show_attn=False, weight=None):
         """ See :obj:`EncoderBase.forward()`"""
         """
     Args:
@@ -110,7 +111,7 @@ class RGATEncoder(nn.Module):
         # Run the forward pass of every layer of the tranformer.
         for i in range(self.num_layers):
             if show_attn:
-                out, top_attn = self.transformer[i](out, mask, src_key_padding_mask, structure=structure)
+                out, top_attn = self.transformer[i](out, mask, src_key_padding_mask, structure=structure, weight=weight)
                 if attn_layers is None:
                     batch_size = top_attn.size()[0]
                     seq_len = top_attn.size()[1]
@@ -118,7 +119,7 @@ class RGATEncoder(nn.Module):
 
                 attn_layers[:, i, :, :] = top_attn.data.cpu().numpy()
             else:
-                out, _ = self.transformer[i](out, mask, src_key_padding_mask, structure=structure)
+                out, _ = self.transformer[i](out, mask, src_key_padding_mask, structure=structure, weight=weight)
         out = self.layer_norm(out)  # [B, seq, H]
         return out, attn_layers
 

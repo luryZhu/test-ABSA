@@ -32,6 +32,8 @@ class MultiHeadedAttention(nn.Module):
         self.linear_keys = nn.Linear(model_dim, head_count * self.dim_per_head)
         self.linear_values = nn.Linear(model_dim, head_count * self.dim_per_head)
         self.linear_query = nn.Linear(model_dim, head_count * self.dim_per_head)
+        # Define an additional linear transformation for the weight
+        # self.linear_weight = nn.Linear(model_dim, head_count * self.dim_per_head)
         if use_structure:
             self.linear_structure_k = nn.Linear(structure_dim, self.dim_per_head)
             self.linear_structure_v = nn.Linear(structure_dim, self.dim_per_head)
@@ -54,6 +56,7 @@ class MultiHeadedAttention(nn.Module):
         key_padding_mask=None,
         layer_cache=None,
         type=None,
+        weight=None,
     ):
         """
         Compute the context vector and the attention vectors.
@@ -111,7 +114,21 @@ class MultiHeadedAttention(nn.Module):
 
         def unshape(x):
             """  compute context """
+
             return x.transpose(1, 2).contiguous().view(batch_size, -1, head_count * dim_per_head)
+
+        def shape_weight(x):
+            seq_len = x.size(1)
+            # 将每行数据 reshape 成二维张量，大小为 (1, seq_len)
+            row_vectors = x.view(-1, 1, seq_len)
+
+            # 构造与 row_vectors 维度相同的列向量，大小为 (1, seq_len, 1)
+            column_vectors = row_vectors.transpose(1, 2)
+
+            # 进行批矩阵乘法，得到大小为 (32, 45, 45) 的结果张量
+            result = torch.bmm(column_vectors, row_vectors)
+            result = result.unsqueeze(1).repeat(1, self.head_count, 1, 1)
+            return result
 
         # 1) Project key, value, and query.
         if layer_cache is not None:
@@ -121,6 +138,13 @@ class MultiHeadedAttention(nn.Module):
                     self.linear_keys(query),
                     self.linear_values(query),
                 )
+
+                if weight is not None:
+                    weight = shape_weight(weight)
+                    query *= weight
+                    key *= weight
+                    value *= weight
+
                 if structure is not None:
                     structure_k, structure_v = (
                         self.linear_structure_k(structure),
@@ -183,6 +207,11 @@ class MultiHeadedAttention(nn.Module):
         query = query / math.sqrt(dim_per_head)
         scores = torch.matmul(query, key.transpose(2, 3))  # [batch_size, nhead, seq_len, seq_len]
         # print('scores',scores.size())
+        # calculate layer
+        if weight is not None:
+            weight = shape_weight(weight)
+            # weight = self.linear_weight(weight)
+            scores *= weight
 
         if structure_k is not None:  # [batch_size, seq_len, seq_len, dim]
             q = query.transpose(1, 2)  # [batch_size, seq_len, nhead, dim]

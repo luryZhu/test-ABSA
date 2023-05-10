@@ -86,6 +86,7 @@ class ABSAEncoder(nn.Module):
             text_raw_bert_indices,
             bert_sequence,
             bert_segments_ids,
+            dist,
         ) = inputs  # unpack inputs
         maxlen = max(l.data)
         """
@@ -160,6 +161,7 @@ class DoubleEncoder(nn.Module):
         self.Sent_encoder = bert
         self.in_drop = nn.Dropout(args.input_dropout)
         self.dense = nn.Linear(args.hidden_dim, args.bert_out_dim)  # dimension reduction
+        self.use_dist = args.use_dist
         
         if use_dep:
             self.pos_emb, self.post_emb, self.dep_emb = embeddings
@@ -202,6 +204,7 @@ class DoubleEncoder(nn.Module):
             text_raw_bert_indices,
             bert_sequence,
             bert_segments_ids,
+            dist,
         ) = inputs  # unpack inputs
 
         bert_sequence = bert_sequence[:, 0:bert_segments_ids.size(1)]
@@ -228,8 +231,11 @@ class DoubleEncoder(nn.Module):
 
         inp = bert_out  # [bsz, seq_len, H]
         # Graph_encoder is RGATEncoder
+        if not self.use_dist:
+            dist = None
+
         graph_out, attn_layers = self.Graph_encoder(
-            inp, mask=mask, src_key_padding_mask=key_padding_mask, structure=dep_relation_embs, show_attn=show_attn
+            inp, mask=mask, src_key_padding_mask=key_padding_mask, structure=dep_relation_embs, show_attn=show_attn, weight=dist
         )               # [bsz, seq_len, H]
         return graph_out, bert_pool_output, bert_out, attn_layers
 

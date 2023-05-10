@@ -79,6 +79,9 @@ class ABSADataLoader(object):
         deps = [dep_vocab.itos[i] for i in deps]
         return tokens, aspects, deps
 
+    def get_distance_weight(self, dist):
+        return 1 - (dist-1) / 6
+
     def preprocess(self, data, vocab, args):
         # unpack vocab
         token_vocab, post_vocab, pos_vocab, dep_vocab, pol_vocab = vocab
@@ -103,6 +106,8 @@ class ABSADataLoader(object):
                 head = list(d["head"])
                 # deprel
                 deprel = list(d["deprel"])
+                # distance
+                dist = list(d["distance"])
                 # real length
                 length = len(tok)
                 # position
@@ -141,6 +146,9 @@ class ABSADataLoader(object):
                 deprel = [dep_vocab.stoi.get(t, dep_vocab.unk_index) for t in deprel]
                 # mapping post
                 post = [post_vocab.stoi.get(t, post_vocab.unk_index) for t in post]
+                # get dist weight
+                dist = [self.get_distance_weight(d) for d in dist]
+
 
                 try:
                     assert (
@@ -150,6 +158,7 @@ class ABSADataLoader(object):
                         and len(deprel) == length
                         and len(post) == length
                         and len(mask) == length
+                        and len(dist) == length
                     )
                 except:
                     print("error:", d)
@@ -167,6 +176,7 @@ class ABSADataLoader(object):
                         text_raw_bert_indices,
                         bert_sequence,
                         bert_segments_ids,
+                        dist,
                         label,
                     )
                 ]
@@ -215,8 +225,12 @@ class ABSADataLoader(object):
         bert_sequence = torch.LongTensor(batch[9])
 
         bert_segments_ids = get_long_tensor(batch[10], batch_size)
+
+        # dist
+        dist = get_float_tensor(batch[11], batch_size)
+
         # label
-        label = torch.LongTensor(batch[11])
+        label = torch.LongTensor(batch[12])
         # bert input
 
         return (
@@ -231,6 +245,7 @@ class ABSADataLoader(object):
             text_raw_bert_indices,
             bert_sequence,
             bert_segments_ids,
+            dist,
             label,
         )
 
