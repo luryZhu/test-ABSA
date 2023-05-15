@@ -166,7 +166,7 @@ def evaluate(model, data_loader, show_attn=False):
 
     # 计算精度、召回率、F1值和支持度
     precision, recall, f1, support = metrics.precision_recall_fscore_support(
-        labels, predictions, average="None")
+        labels, predictions, average=None)
     for i in range(len(precision)):
         print(f'Class {i}: Precision={precision[i]}, recall={recall[i]}, F1={f1[i]}')
 
