@@ -166,11 +166,17 @@ def evaluate(model, data_loader, show_attn=False):
 
     # 计算精度、召回率、F1值和支持度
     precision, recall, f1, support = metrics.precision_recall_fscore_support(
-        labels, predictions, average="macro")
-    print('Precision: ', precision)
-    print('Recall: ', recall)
-    print('F1 score: ', f1)
-    print('Support: ', support)
+        labels, predictions, average="None")
+    for i in range(len(precision)):
+        print(f'Class {i}: Precision={precision[i]}, recall={recall[i]}, F1={f1[i]}')
+
+    # 计算宏平均F1值
+    macro_f1 = f1.mean()
+    print('Macro-averaged F1 score: ', macro_f1)
+    # print('Precision: ', precision)
+    # print('Recall: ', recall)
+    # print('F1 score: ', f1)
+    # print('Support: ', support)
 
     # f1 score
     f1_score = metrics.f1_score(labels, predictions, average="macro")
