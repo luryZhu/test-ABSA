@@ -186,7 +186,7 @@ def _totally_parameters(model):  #
 # build model
 trainer = ABSATrainer(args)
 
-flops, params = profile(trainer.model, inputs=(train_batch[0],))
+flops, params = profile(trainer.model, inputs=(train_batch[0][0:12],))
 print('FLOPS: ', flops)
 # print(trainer.model)
 print("Total parameters:", _totally_parameters(trainer.model))
