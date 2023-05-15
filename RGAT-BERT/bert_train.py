@@ -160,6 +160,17 @@ def evaluate(model, data_loader, show_attn=False):
                     if j%16==0:
                         good_case.append(get_case(batch, j, id))
 
+    # 计算混淆矩阵
+    confusion_matrix = metrics.confusion_matrix(labels, predictions)
+    print('Confusion matrix: \n', confusion_matrix)
+
+    # 计算精度、召回率、F1值和支持度
+    precision, recall, f1, support = metrics.precision_recall_fscore_support(
+        labels, predictions, average="macro")
+    print('Precision: ', precision)
+    print('Recall: ', recall)
+    print('F1 score: ', f1)
+    print('Support: ', support)
 
     # f1 score
     f1_score = metrics.f1_score(labels, predictions, average="macro")
